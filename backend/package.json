@@ -1,0 +1,21 @@
+{
+  "name": "mundial-quiniela-backend",
+  "version": "1.0.0",
+  "description": "Backend para quiniela del Mundial 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings server.js",
+    "dev": "nodemon --exec 'node --no-warnings' server.js",
+    "seed": "node --no-warnings seed.js",
+    "build": "cd ../frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
