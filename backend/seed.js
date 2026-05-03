@@ -1,32 +1,8 @@
-const { DatabaseSync } = require('node:sqlite');
 const bcrypt = require('bcryptjs');
-const path = require('path');
 
-require('./db'); // asegura que las tablas existan
+// Reusar la misma conexión (respeta DB_PATH)
+const db = require('./db');
 
-const db = new DatabaseSync(path.join(__dirname, 'quiniela.db'));
-
-console.log('🌱 Inicializando base de datos...');
-
-db.exec('DELETE FROM predictions');
-db.exec('DELETE FROM matches');
-db.exec('DELETE FROM users');
-db.exec("DELETE FROM sqlite_sequence WHERE name IN ('users','matches','predictions')");
-
-// Admin
-const adminPwd = bcrypt.hashSync('admin123', 10);
-db.prepare('INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, 1)')
-  .run('admin', 'admin@mundial2026.com', adminPwd);
-
-// Usuarios de prueba
-const userPwd = bcrypt.hashSync('pass123', 10);
-['Carlos', 'Lucía', 'Pedro', 'Ana', 'Miguel', 'Sofía'].forEach(name => {
-  db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)')
-    .run(name, `${name.toLowerCase()}@ejemplo.com`, userPwd);
-});
-
-// Cada grupo: [nombre, [equipo, bandera], ...]
-// Partidos por grupo: 1v2, 3v4 | 1v3, 2v4 | 1v4, 2v3
 const groups = [
   { name: 'Grupo A', teams: [
     ['México',          '🇲🇽'],
@@ -78,17 +54,17 @@ const groups = [
   ], dates: ['2026-06-14', '2026-06-15', '2026-06-19', '2026-06-19', '2026-06-24', '2026-06-24'] },
 
   { name: 'Grupo H', teams: [
-    ['España',        '🇪🇸'],
-    ['Uruguay',       '🇺🇾'],
-    ['Arabia Saudita','🇸🇦'],
-    ['Cabo Verde',    '🇨🇻'],
+    ['España',         '🇪🇸'],
+    ['Uruguay',        '🇺🇾'],
+    ['Arabia Saudita', '🇸🇦'],
+    ['Cabo Verde',     '🇨🇻'],
   ], dates: ['2026-06-14', '2026-06-15', '2026-06-19', '2026-06-20', '2026-06-24', '2026-06-24'] },
 
   { name: 'Grupo I', teams: [
-    ['Francia',  '🇫🇷'],
-    ['Senegal',  '🇸🇳'],
-    ['Noruega',  '🇳🇴'],
-    ['Irak',     '🇮🇶'],
+    ['Francia', '🇫🇷'],
+    ['Senegal', '🇸🇳'],
+    ['Noruega', '🇳🇴'],
+    ['Irak',    '🇮🇶'],
   ], dates: ['2026-06-15', '2026-06-15', '2026-06-20', '2026-06-20', '2026-06-25', '2026-06-25'] },
 
   { name: 'Grupo J', teams: [
@@ -99,10 +75,10 @@ const groups = [
   ], dates: ['2026-06-15', '2026-06-16', '2026-06-20', '2026-06-21', '2026-06-25', '2026-06-25'] },
 
   { name: 'Grupo K', teams: [
-    ['Portugal',    '🇵🇹'],
-    ['Colombia',    '🇨🇴'],
-    ['Uzbekistán',  '🇺🇿'],
-    ['RD Congo',    '🇨🇩'],
+    ['Portugal',   '🇵🇹'],
+    ['Colombia',   '🇨🇴'],
+    ['Uzbekistán', '🇺🇿'],
+    ['RD Congo',   '🇨🇩'],
   ], dates: ['2026-06-16', '2026-06-16', '2026-06-21', '2026-06-21', '2026-06-26', '2026-06-26'] },
 
   { name: 'Grupo L', teams: [
@@ -116,39 +92,65 @@ const groups = [
 // Horarios rotativos para los 6 partidos de cada grupo
 const TIMES = ['13:00', '16:00', '19:00', '22:00', '19:00', '19:00'];
 
-const insertMatch = db.prepare(`
-  INSERT INTO matches (home_team, away_team, home_flag, away_flag, match_date, group_name, stage)
-  VALUES (?, ?, ?, ?, ?, ?, 'Fase de Grupos')
-`);
-
 // Combinaciones: (0v1, 2v3), (0v2, 1v3), (0v3, 1v2)
 const COMBOS = [[0,1,2,3], [0,2,1,3], [0,3,1,2]];
 
-let total = 0;
-db.exec('BEGIN');
-for (const g of groups) {
-  const [t1, t2, t3, t4] = g.teams;
-  const dateIdx = [0,1,2,3,4,5];
-  COMBOS.forEach(([a,b,c,d], round) => {
-    const match1Date = `${g.dates[round * 2]}T${TIMES[round * 2]}`;
-    const match2Date = `${g.dates[round * 2 + 1]}T${TIMES[round * 2 + 1]}`;
-    insertMatch.run(
-      g.teams[a][0], g.teams[b][0], g.teams[a][1], g.teams[b][1],
-      match1Date, g.name
-    );
-    insertMatch.run(
-      g.teams[c][0], g.teams[d][0], g.teams[c][1], g.teams[d][1],
-      match2Date, g.name
-    );
-    total += 2;
-  });
+function insertMatches() {
+  const insertMatch = db.prepare(`
+    INSERT INTO matches (home_team, away_team, home_flag, away_flag, match_date, group_name, stage)
+    VALUES (?, ?, ?, ?, ?, ?, 'Fase de Grupos')
+  `);
+  let total = 0;
+  db.exec('BEGIN');
+  for (const g of groups) {
+    COMBOS.forEach(([a, b, c, d], round) => {
+      const d1 = `${g.dates[round * 2]}T${TIMES[round * 2]}`;
+      const d2 = `${g.dates[round * 2 + 1]}T${TIMES[round * 2 + 1]}`;
+      insertMatch.run(g.teams[a][0], g.teams[b][0], g.teams[a][1], g.teams[b][1], d1, g.name);
+      insertMatch.run(g.teams[c][0], g.teams[d][0], g.teams[c][1], g.teams[d][1], d2, g.name);
+      total += 2;
+    });
+  }
+  db.exec('COMMIT');
+  return total;
 }
-db.exec('COMMIT');
 
-console.log(`✅ ${total} partidos insertados (${groups.length} grupos)`);
-console.log('');
-console.log('👤 Administrador:');
-console.log('   Email: admin@mundial2026.com  |  Contraseña: admin123');
-console.log('');
-console.log('👥 Usuarios de prueba (contraseña: pass123):');
-console.log('   Carlos, Lucía, Pedro, Ana, Miguel, Sofía  @ejemplo.com');
+// Llamado desde server.js al arrancar: solo siembra si la tabla está vacía
+function seedMatchesIfEmpty() {
+  const { count } = db.prepare('SELECT COUNT(*) as count FROM matches').get();
+  if (count > 0) return;
+  const total = insertMatches();
+  console.log(`🌍 Seed: ${total} partidos insertados (${groups.length} grupos)`);
+}
+
+// Cuando se ejecuta directamente: reset completo (solo para desarrollo)
+if (require.main === module) {
+  console.log('🌱 Inicializando base de datos...');
+
+  db.exec('DELETE FROM predictions');
+  db.exec('DELETE FROM matches');
+  db.exec('DELETE FROM users');
+  db.exec("DELETE FROM sqlite_sequence WHERE name IN ('users','matches','predictions')");
+
+  const adminPwd = bcrypt.hashSync('admin123', 10);
+  db.prepare('INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, 1)')
+    .run('admin', 'admin@mundial2026.com', adminPwd);
+
+  const userPwd = bcrypt.hashSync('pass123', 10);
+  ['Carlos', 'Lucía', 'Pedro', 'Ana', 'Miguel', 'Sofía'].forEach(name => {
+    db.prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)')
+      .run(name, `${name.toLowerCase()}@ejemplo.com`, userPwd);
+  });
+
+  const total = insertMatches();
+
+  console.log(`✅ ${total} partidos insertados (${groups.length} grupos)`);
+  console.log('');
+  console.log('👤 Administrador:');
+  console.log('   Email: admin@mundial2026.com  |  Contraseña: admin123');
+  console.log('');
+  console.log('👥 Usuarios de prueba (contraseña: pass123):');
+  console.log('   Carlos, Lucía, Pedro, Ana, Miguel, Sofía  @ejemplo.com');
+}
+
+module.exports = { seedMatchesIfEmpty };

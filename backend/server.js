@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { seedMatchesIfEmpty } = require('./seed');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,5 +31,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+  seedMatchesIfEmpty();
   console.log(`🌍 Mundial Quiniela API corriendo en http://localhost:${PORT}`);
 });
