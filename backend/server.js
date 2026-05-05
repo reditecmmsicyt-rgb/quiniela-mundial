@@ -30,7 +30,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   seedMatchesIfEmpty();
-  console.log(`🌍 Mundial Quiniela API corriendo en http://localhost:${PORT}`);
+  console.log(`🌍 Mundial Quiniela API corriendo en http://0.0.0.0:${PORT}`);
 });
