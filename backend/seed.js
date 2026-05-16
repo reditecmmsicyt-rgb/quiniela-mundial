@@ -114,10 +114,7 @@ function insertMatches() {
 }
 
 function seedMatchesIfEmpty() {
-  const { count } = db.prepare('SELECT COUNT(*) as count FROM matches').get();
-  if (count > 0) return;
-
-  // Primera vez: crear admin si no existe
+  // Crear admin si no existe (independiente de si hay partidos)
   const adminExists = db.prepare("SELECT id FROM users WHERE email = 'admin@mundial2026.com'").get();
   if (!adminExists) {
     const hash = bcrypt.hashSync('admin123', 10);
@@ -126,6 +123,8 @@ function seedMatchesIfEmpty() {
     console.log('👤 Admin creado: admin@mundial2026.com / admin123');
   }
 
+  const { count } = db.prepare('SELECT COUNT(*) as count FROM matches').get();
+  if (count > 0) return;
   const total = insertMatches();
   console.log(`🌍 Seed: ${total} partidos insertados (fase de grupos, horarios hora México)`);
 }
