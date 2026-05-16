@@ -58,16 +58,15 @@ router.put('/matches/:id/result', (req, res) => {
 
   const hs = parseInt(home_score);
   const as_ = parseInt(away_score);
-
-  db.prepare('UPDATE matches SET home_score = ?, away_score = ?, is_finished = 1 WHERE id = ?').run(hs, as_, id);
-
   const actual = hs > as_ ? 'L' : as_ > hs ? 'V' : 'E';
 
-  const predictions = db.prepare('SELECT * FROM predictions WHERE match_id = ?').all(id);
-  const updatePts = db.prepare('UPDATE predictions SET points = ? WHERE id = ?');
+  const updateMatch = db.prepare('UPDATE matches SET home_score = ?, away_score = ?, is_finished = 1 WHERE id = ?');
+  const updatePts   = db.prepare('UPDATE predictions SET points = ? WHERE id = ?');
+  const getPreds    = db.prepare('SELECT id, result FROM predictions WHERE match_id = ?');
 
   db.transaction(() => {
-    predictions.forEach(pred => {
+    updateMatch.run(hs, as_, id);
+    getPreds.all(id).forEach(pred => {
       updatePts.run(pred.result === actual ? 1 : 0, pred.id);
     });
   })();

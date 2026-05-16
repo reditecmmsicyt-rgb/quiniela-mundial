@@ -1,126 +1,123 @@
 const bcrypt = require('bcryptjs');
-
-// Reusar la misma conexión (respeta DB_PATH)
 const db = require('./db');
 
-const groups = [
-  { name: 'Grupo A', teams: [
-    ['México',          '🇲🇽'],
-    ['Corea del Sur',   '🇰🇷'],
-    ['Sudáfrica',       '🇿🇦'],
-    ['República Checa', '🇨🇿'],
-  ], dates: ['2026-06-11', '2026-06-11', '2026-06-18', '2026-06-18', '2026-06-24', '2026-06-24'] },
+// Calendario oficial FIFA 2026 — horarios en hora de México (CDT, UTC-6)
+const matches = [
+  // ── Grupo A ──────────────────────────────────────────────────────────────
+  { home: 'México',          hf: '🇲🇽', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-11T13:00', group: 'Grupo A' },
+  { home: 'Corea del Sur',   hf: '🇰🇷', away: 'República Checa',  af: '🇨🇿', date: '2026-06-11T20:00', group: 'Grupo A' },
+  { home: 'República Checa', hf: '🇨🇿', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-18T11:00', group: 'Grupo A' },
+  { home: 'México',          hf: '🇲🇽', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-18T18:00', group: 'Grupo A' },
+  { home: 'República Checa', hf: '🇨🇿', away: 'México',           af: '🇲🇽', date: '2026-06-24T20:00', group: 'Grupo A' },
+  { home: 'Sudáfrica',       hf: '🇿🇦', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-24T20:00', group: 'Grupo A' },
 
-  { name: 'Grupo B', teams: [
-    ['Canadá', '🇨🇦'],
-    ['Suiza',  '🇨🇭'],
-    ['Catar',  '🇶🇦'],
-    ['Bosnia', '🇧🇦'],
-  ], dates: ['2026-06-12', '2026-06-13', '2026-06-18', '2026-06-18', '2026-06-24', '2026-06-24'] },
+  // ── Grupo B ──────────────────────────────────────────────────────────────
+  { home: 'Canadá',  hf: '🇨🇦', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-12T14:00', group: 'Grupo B' },
+  { home: 'Catar',   hf: '🇶🇦', away: 'Suiza',   af: '🇨🇭', date: '2026-06-13T13:00', group: 'Grupo B' },
+  { home: 'Suiza',   hf: '🇨🇭', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-18T11:00', group: 'Grupo B' },
+  { home: 'Canadá',  hf: '🇨🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-18T14:00', group: 'Grupo B' },
+  { home: 'Suiza',   hf: '🇨🇭', away: 'Canadá',  af: '🇨🇦', date: '2026-06-24T11:00', group: 'Grupo B' },
+  { home: 'Bosnia',  hf: '🇧🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-24T11:00', group: 'Grupo B' },
 
-  { name: 'Grupo C', teams: [
-    ['Brasil',    '🇧🇷'],
-    ['Marruecos', '🇲🇦'],
-    ['Escocia',   '🏴󠁧󠁢󠁳󠁣󠁴󠁿'],
-    ['Haití',     '🇭🇹'],
-  ], dates: ['2026-06-13', '2026-06-13', '2026-06-19', '2026-06-19', '2026-06-24', '2026-06-24'] },
+  // ── Grupo C ──────────────────────────────────────────────────────────────
+  { home: 'Brasil',    hf: '🇧🇷', away: 'Marruecos', af: '🇲🇦', date: '2026-06-13T17:00', group: 'Grupo C' },
+  { home: 'Haití',     hf: '🇭🇹', away: 'Escocia',   af: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', date: '2026-06-13T20:00', group: 'Grupo C' },
+  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Marruecos', af: '🇲🇦', date: '2026-06-19T17:00', group: 'Grupo C' },
+  { home: 'Brasil',    hf: '🇧🇷', away: 'Haití',     af: '🇭🇹', date: '2026-06-19T20:00', group: 'Grupo C' },
+  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Brasil',    af: '🇧🇷', date: '2026-06-24T17:00', group: 'Grupo C' },
+  { home: 'Marruecos', hf: '🇲🇦', away: 'Haití',     af: '🇭🇹', date: '2026-06-24T17:00', group: 'Grupo C' },
 
-  { name: 'Grupo D', teams: [
-    ['Estados Unidos', '🇺🇸'],
-    ['Paraguay',       '🇵🇾'],
-    ['Australia',      '🇦🇺'],
-    ['Turquía',        '🇹🇷'],
-  ], dates: ['2026-06-12', '2026-06-13', '2026-06-19', '2026-06-19', '2026-06-25', '2026-06-25'] },
+  // ── Grupo D ──────────────────────────────────────────────────────────────
+  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-12T17:00', group: 'Grupo D' },
+  { home: 'Australia',      hf: '🇦🇺', away: 'Turquía',   af: '🇹🇷', date: '2026-06-13T22:00', group: 'Grupo D' },
+  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Australia', af: '🇦🇺', date: '2026-06-19T11:00', group: 'Grupo D' },
+  { home: 'Turquía',        hf: '🇹🇷', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-19T20:00', group: 'Grupo D' },
+  { home: 'Paraguay',       hf: '🇵🇾', away: 'Australia', af: '🇦🇺', date: '2026-06-25T18:00', group: 'Grupo D' },
+  { home: 'Turquía',        hf: '🇹🇷', away: 'Estados Unidos', af: '🇺🇸', date: '2026-06-25T18:00', group: 'Grupo D' },
 
-  { name: 'Grupo E', teams: [
-    ['Alemania',        '🇩🇪'],
-    ['Ecuador',         '🇪🇨'],
-    ['Costa de Marfil', '🇨🇮'],
-    ['Curazao',         '🇨🇼'],
-  ], dates: ['2026-06-14', '2026-06-14', '2026-06-20', '2026-06-20', '2026-06-25', '2026-06-25'] },
+  // ── Grupo E ──────────────────────────────────────────────────────────────
+  { home: 'Alemania',        hf: '🇩🇪', away: 'Curazao',         af: '🇨🇼', date: '2026-06-14T11:00', group: 'Grupo E' },
+  { home: 'Costa de Marfil', hf: '🇨🇮', away: 'Ecuador',         af: '🇪🇨', date: '2026-06-14T18:00', group: 'Grupo E' },
+  { home: 'Alemania',        hf: '🇩🇪', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-20T15:00', group: 'Grupo E' },
+  { home: 'Ecuador',         hf: '🇪🇨', away: 'Curazao',         af: '🇨🇼', date: '2026-06-20T18:00', group: 'Grupo E' },
+  { home: 'Curazao',         hf: '🇨🇼', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-25T15:00', group: 'Grupo E' },
+  { home: 'Ecuador',         hf: '🇪🇨', away: 'Alemania',        af: '🇩🇪', date: '2026-06-25T15:00', group: 'Grupo E' },
 
-  { name: 'Grupo F', teams: [
-    ['Países Bajos', '🇳🇱'],
-    ['Japón',        '🇯🇵'],
-    ['Túnez',        '🇹🇳'],
-    ['Suecia',       '🇸🇪'],
-  ], dates: ['2026-06-14', '2026-06-14', '2026-06-20', '2026-06-20', '2026-06-25', '2026-06-25'] },
+  // ── Grupo F ──────────────────────────────────────────────────────────────
+  { home: 'Países Bajos', hf: '🇳🇱', away: 'Japón',          af: '🇯🇵', date: '2026-06-14T14:00', group: 'Grupo F' },
+  { home: 'Suecia',       hf: '🇸🇪', away: 'Túnez',          af: '🇹🇳', date: '2026-06-14T19:00', group: 'Grupo F' },
+  { home: 'Países Bajos', hf: '🇳🇱', away: 'Suecia',         af: '🇸🇪', date: '2026-06-20T11:00', group: 'Grupo F' },
+  { home: 'Túnez',        hf: '🇹🇳', away: 'Japón',          af: '🇯🇵', date: '2026-06-20T21:00', group: 'Grupo F' },
+  { home: 'Japón',        hf: '🇯🇵', away: 'Suecia',         af: '🇸🇪', date: '2026-06-25T17:00', group: 'Grupo F' },
+  { home: 'Túnez',        hf: '🇹🇳', away: 'Países Bajos',   af: '🇳🇱', date: '2026-06-25T17:00', group: 'Grupo F' },
 
-  { name: 'Grupo G', teams: [
-    ['Bélgica',       '🇧🇪'],
-    ['Irán',          '🇮🇷'],
-    ['Egipto',        '🇪🇬'],
-    ['Nueva Zelanda', '🇳🇿'],
-  ], dates: ['2026-06-15', '2026-06-15', '2026-06-21', '2026-06-21', '2026-06-26', '2026-06-26'] },
+  // ── Grupo G ──────────────────────────────────────────────────────────────
+  { home: 'Bélgica',       hf: '🇧🇪', away: 'Egipto',        af: '🇪🇬', date: '2026-06-15T11:00', group: 'Grupo G' },
+  { home: 'Irán',          hf: '🇮🇷', away: 'Nueva Zelanda', af: '🇳🇿', date: '2026-06-15T17:00', group: 'Grupo G' },
+  { home: 'Bélgica',       hf: '🇧🇪', away: 'Irán',          af: '🇮🇷', date: '2026-06-21T11:00', group: 'Grupo G' },
+  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Egipto',        af: '🇪🇬', date: '2026-06-21T17:00', group: 'Grupo G' },
+  { home: 'Egipto',        hf: '🇪🇬', away: 'Irán',          af: '🇮🇷', date: '2026-06-26T19:00', group: 'Grupo G' },
+  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Bélgica',       af: '🇧🇪', date: '2026-06-26T19:00', group: 'Grupo G' },
 
-  { name: 'Grupo H', teams: [
-    ['España',         '🇪🇸'],
-    ['Uruguay',        '🇺🇾'],
-    ['Arabia Saudita', '🇸🇦'],
-    ['Cabo Verde',     '🇨🇻'],
-  ], dates: ['2026-06-15', '2026-06-15', '2026-06-21', '2026-06-21', '2026-06-26', '2026-06-26'] },
+  // ── Grupo H ──────────────────────────────────────────────────────────────
+  { home: 'España',         hf: '🇪🇸', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-15T11:00', group: 'Grupo H' },
+  { home: 'Arabia Saudita', hf: '🇸🇦', away: 'Uruguay',       af: '🇺🇾', date: '2026-06-15T17:00', group: 'Grupo H' },
+  { home: 'España',         hf: '🇪🇸', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-21T11:00', group: 'Grupo H' },
+  { home: 'Uruguay',        hf: '🇺🇾', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-21T17:00', group: 'Grupo H' },
+  { home: 'Uruguay',        hf: '🇺🇾', away: 'España',        af: '🇪🇸', date: '2026-06-26T17:00', group: 'Grupo H' },
+  { home: 'Cabo Verde',     hf: '🇨🇻', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-26T18:00', group: 'Grupo H' },
 
-  { name: 'Grupo I', teams: [
-    ['Francia', '🇫🇷'],
-    ['Senegal', '🇸🇳'],
-    ['Noruega', '🇳🇴'],
-    ['Irak',    '🇮🇶'],
-  ], dates: ['2026-06-16', '2026-06-16', '2026-06-22', '2026-06-22', '2026-06-26', '2026-06-26'] },
+  // ── Grupo I ──────────────────────────────────────────────────────────────
+  { home: 'Francia',  hf: '🇫🇷', away: 'Senegal', af: '🇸🇳', date: '2026-06-16T14:00', group: 'Grupo I' },
+  { home: 'Irak',     hf: '🇮🇶', away: 'Noruega', af: '🇳🇴', date: '2026-06-16T17:00', group: 'Grupo I' },
+  { home: 'Francia',  hf: '🇫🇷', away: 'Irak',    af: '🇮🇶', date: '2026-06-22T16:00', group: 'Grupo I' },
+  { home: 'Noruega',  hf: '🇳🇴', away: 'Senegal', af: '🇸🇳', date: '2026-06-22T19:00', group: 'Grupo I' },
+  { home: 'Senegal',  hf: '🇸🇳', away: 'Irak',    af: '🇮🇶', date: '2026-06-26T14:00', group: 'Grupo I' },
+  { home: 'Noruega',  hf: '🇳🇴', away: 'Francia', af: '🇫🇷', date: '2026-06-26T14:00', group: 'Grupo I' },
 
-  { name: 'Grupo J', teams: [
-    ['Argentina', '🇦🇷'],
-    ['Austria',   '🇦🇹'],
-    ['Argelia',   '🇩🇿'],
-    ['Jordania',  '🇯🇴'],
-  ], dates: ['2026-06-16', '2026-06-16', '2026-06-22', '2026-06-22', '2026-06-27', '2026-06-27'] },
+  // ── Grupo J ──────────────────────────────────────────────────────────────
+  { home: 'Argentina', hf: '🇦🇷', away: 'Argelia',  af: '🇩🇿', date: '2026-06-16T19:00', group: 'Grupo J' },
+  { home: 'Austria',   hf: '🇦🇹', away: 'Jordania', af: '🇯🇴', date: '2026-06-16T20:00', group: 'Grupo J' },
+  { home: 'Argentina', hf: '🇦🇷', away: 'Austria',  af: '🇦🇹', date: '2026-06-22T11:00', group: 'Grupo J' },
+  { home: 'Jordania',  hf: '🇯🇴', away: 'Argelia',  af: '🇩🇿', date: '2026-06-22T19:00', group: 'Grupo J' },
+  { home: 'Argelia',   hf: '🇩🇿', away: 'Austria',  af: '🇦🇹', date: '2026-06-27T20:00', group: 'Grupo J' },
+  { home: 'Jordania',  hf: '🇯🇴', away: 'Argentina',af: '🇦🇷', date: '2026-06-27T20:00', group: 'Grupo J' },
 
-  { name: 'Grupo K', teams: [
-    ['Portugal',   '🇵🇹'],
-    ['Colombia',   '🇨🇴'],
-    ['Uzbekistán', '🇺🇿'],
-    ['RD Congo',   '🇨🇩'],
-  ], dates: ['2026-06-17', '2026-06-17', '2026-06-23', '2026-06-23', '2026-06-27', '2026-06-27'] },
+  // ── Grupo K ──────────────────────────────────────────────────────────────
+  { home: 'Portugal',    hf: '🇵🇹', away: 'RD Congo',    af: '🇨🇩', date: '2026-06-17T11:00', group: 'Grupo K' },
+  { home: 'Uzbekistán',  hf: '🇺🇿', away: 'Colombia',    af: '🇨🇴', date: '2026-06-17T19:00', group: 'Grupo K' },
+  { home: 'Portugal',    hf: '🇵🇹', away: 'Uzbekistán',  af: '🇺🇿', date: '2026-06-23T11:00', group: 'Grupo K' },
+  { home: 'Colombia',    hf: '🇨🇴', away: 'RD Congo',    af: '🇨🇩', date: '2026-06-23T19:00', group: 'Grupo K' },
+  { home: 'Colombia',    hf: '🇨🇴', away: 'Portugal',    af: '🇵🇹', date: '2026-06-27T18:30', group: 'Grupo K' },
+  { home: 'RD Congo',    hf: '🇨🇩', away: 'Uzbekistán',  af: '🇺🇿', date: '2026-06-27T18:30', group: 'Grupo K' },
 
-  { name: 'Grupo L', teams: [
-    ['Inglaterra', '🏴󠁧󠁢󠁥󠁮󠁧󠁿'],
-    ['Croacia',    '🇭🇷'],
-    ['Ghana',      '🇬🇭'],
-    ['Panamá',     '🇵🇦'],
-  ], dates: ['2026-06-17', '2026-06-17', '2026-06-23', '2026-06-23', '2026-06-27', '2026-06-27'] },
+  // ── Grupo L ──────────────────────────────────────────────────────────────
+  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Croacia', af: '🇭🇷', date: '2026-06-17T14:00', group: 'Grupo L' },
+  { home: 'Ghana',      hf: '🇬🇭', away: 'Panamá',   af: '🇵🇦', date: '2026-06-17T19:00', group: 'Grupo L' },
+  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Ghana',   af: '🇬🇭', date: '2026-06-23T15:00', group: 'Grupo L' },
+  { home: 'Panamá',     hf: '🇵🇦', away: 'Croacia',  af: '🇭🇷', date: '2026-06-23T18:00', group: 'Grupo L' },
+  { home: 'Panamá',     hf: '🇵🇦', away: 'Inglaterra',af: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', date: '2026-06-27T16:00', group: 'Grupo L' },
+  { home: 'Croacia',    hf: '🇭🇷', away: 'Ghana',    af: '🇬🇭', date: '2026-06-27T16:00', group: 'Grupo L' },
 ];
 
-// Horarios rotativos para los 6 partidos de cada grupo
-const TIMES = ['13:00', '16:00', '19:00', '22:00', '19:00', '19:00'];
-
-// Combinaciones: (0v1, 2v3), (0v2, 1v3), (0v3, 1v2)
-const COMBOS = [[0,1,2,3], [0,2,1,3], [0,3,1,2]];
-
 function insertMatches() {
-  const insertMatch = db.prepare(`
+  const stmt = db.prepare(`
     INSERT INTO matches (home_team, away_team, home_flag, away_flag, match_date, group_name, stage)
     VALUES (?, ?, ?, ?, ?, ?, 'Fase de Grupos')
   `);
-  let total = 0;
   db.exec('BEGIN');
-  for (const g of groups) {
-    COMBOS.forEach(([a, b, c, d], round) => {
-      const d1 = `${g.dates[round * 2]}T${TIMES[round * 2]}`;
-      const d2 = `${g.dates[round * 2 + 1]}T${TIMES[round * 2 + 1]}`;
-      insertMatch.run(g.teams[a][0], g.teams[b][0], g.teams[a][1], g.teams[b][1], d1, g.name);
-      insertMatch.run(g.teams[c][0], g.teams[d][0], g.teams[c][1], g.teams[d][1], d2, g.name);
-      total += 2;
-    });
+  for (const m of matches) {
+    stmt.run(m.home, m.away, m.hf, m.af, m.date, m.group);
   }
   db.exec('COMMIT');
-  return total;
+  return matches.length;
 }
 
-// Llamado desde server.js al arrancar: solo siembra si la tabla está vacía
 function seedMatchesIfEmpty() {
   const { count } = db.prepare('SELECT COUNT(*) as count FROM matches').get();
   if (count > 0) return;
   const total = insertMatches();
-  console.log(`🌍 Seed: ${total} partidos insertados (${groups.length} grupos)`);
+  console.log(`🌍 Seed: ${total} partidos insertados (fase de grupos, horarios hora México)`);
 }
 
 // Cuando se ejecuta directamente: reset completo (solo para desarrollo)
@@ -144,7 +141,7 @@ if (require.main === module) {
 
   const total = insertMatches();
 
-  console.log(`✅ ${total} partidos insertados (${groups.length} grupos)`);
+  console.log(`✅ ${total} partidos insertados (72 partidos, fase de grupos)`);
   console.log('');
   console.log('👤 Administrador:');
   console.log('   Email: admin@mundial2026.com  |  Contraseña: admin123');
