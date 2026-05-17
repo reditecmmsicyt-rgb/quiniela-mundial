@@ -1,6 +1,85 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../api';
 
+const RESULT_LABEL = { L: 'Local', E: 'Empate', V: 'Visitante' };
+
+function UserPredictionsModal({ user, onClose }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get(`/admin/users/${user.id}/predictions`)
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [user.id]);
+
+  const predictions = data?.predictions ?? [];
+  const filled   = predictions.filter(p => p.result !== null);
+  const correct  = filled.filter(p => p.points > 0).length;
+  const finished = predictions.filter(p => p.is_finished).length;
+
+  function resultColor(p) {
+    if (!p.is_finished || p.result === null) return 'text-gray-500';
+    return p.points > 0 ? 'text-green-400' : 'text-red-400';
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="card w-full max-w-2xl max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-bold text-lg">{user.username}</h3>
+            <p className="text-xs text-gray-400">
+              {filled.length} predicciones · {correct} aciertos de {finished} partidos jugados
+            </p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">✕</button>
+        </div>
+
+        {loading ? (
+          <div className="text-gray-400 text-center py-8">Cargando...</div>
+        ) : (
+          <div className="overflow-y-auto flex-1">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-gray-800">
+                <tr className="border-b border-gray-700 text-gray-400 text-xs uppercase">
+                  <th className="px-3 py-2 text-left">Partido</th>
+                  <th className="px-3 py-2 text-center">Predicción</th>
+                  <th className="px-3 py-2 text-center">Resultado</th>
+                  <th className="px-3 py-2 text-center">Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                {predictions.map(p => (
+                  <tr key={p.match_id} className="border-b border-gray-700/40">
+                    <td className="px-3 py-2">
+                      <div className="text-xs text-gray-400">{p.group_name} · {new Date(p.match_date).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })} {p.match_date.slice(11,16)}h</div>
+                      <div className="font-medium">{p.home_flag} {p.home_team} vs {p.away_flag} {p.away_team}</div>
+                    </td>
+                    <td className={`px-3 py-2 text-center font-semibold ${p.result ? resultColor(p) : 'text-gray-600'}`}>
+                      {p.result ? RESULT_LABEL[p.result] : '—'}
+                    </td>
+                    <td className="px-3 py-2 text-center text-gray-400">
+                      {p.is_finished ? `${p.home_score}–${p.away_score}` : '—'}
+                    </td>
+                    <td className="px-3 py-2 text-center font-bold">
+                      {p.is_finished && p.result !== null
+                        ? <span className={p.points > 0 ? 'text-green-400' : 'text-red-400'}>{p.points}</span>
+                        : <span className="text-gray-600">—</span>
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ResultModal({ match, onClose, onSaved }) {
   const [home, setHome] = useState(match.home_score ?? '');
   const [away, setAway] = useState(match.away_score ?? '');
@@ -146,8 +225,9 @@ export default function Admin() {
   const [users, setUsers]       = useState([]);
   const [loadingM, setLoadingM] = useState(true);
   const [loadingU, setLoadingU] = useState(false);
-  const [modal, setModal]       = useState(null);
-  const [deleting, setDeleting] = useState(null);
+  const [modal, setModal]           = useState(null);
+  const [userModal, setUserModal]   = useState(null);
+  const [deleting, setDeleting]     = useState(null);
 
   const loadMatches = useCallback(async () => {
     setLoadingM(true);
@@ -253,6 +333,7 @@ export default function Admin() {
                   <th className="px-4 py-3 text-left">Email</th>
                   <th className="px-4 py-3 text-center">Rol</th>
                   <th className="px-4 py-3 text-left hidden md:table-cell">Registro</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
@@ -269,6 +350,16 @@ export default function Admin() {
                     <td className="px-4 py-3 text-gray-400 hidden md:table-cell text-xs">
                       {new Date(u.created_at).toLocaleDateString('es-MX')}
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      {!u.is_admin && (
+                        <button
+                          onClick={() => setUserModal(u)}
+                          className="text-xs text-green-400 hover:text-green-300 underline"
+                        >
+                          Ver predicciones
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -282,6 +373,13 @@ export default function Admin() {
           match={modal}
           onClose={() => setModal(null)}
           onSaved={loadMatches}
+        />
+      )}
+
+      {userModal && (
+        <UserPredictionsModal
+          user={userModal}
+          onClose={() => setUserModal(null)}
         />
       )}
     </div>

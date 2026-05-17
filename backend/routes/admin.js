@@ -99,4 +99,29 @@ router.put('/users/:id/admin', (req, res) => {
   res.json({ message: 'Rol actualizado' });
 });
 
+router.get('/users/:id/predictions', (req, res) => {
+  const { id } = req.params;
+  const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(id);
+  if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+  const predictions = db.prepare(`
+    SELECT
+      m.id          AS match_id,
+      m.match_date,
+      m.group_name,
+      m.stage,
+      m.home_team,  m.home_flag,
+      m.away_team,  m.away_flag,
+      m.home_score, m.away_score,
+      m.is_finished,
+      p.result,
+      p.points
+    FROM matches m
+    LEFT JOIN predictions p ON p.match_id = m.id AND p.user_id = ?
+    ORDER BY m.match_date ASC
+  `).all(id);
+
+  res.json({ user, predictions });
+});
+
 module.exports = router;
