@@ -242,11 +242,28 @@ export default function Matches() {
                 <p className="text-xs text-gray-400">{dayMatches.length} partido{dayMatches.length > 1 ? 's' : ''}</p>
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {dayMatches.map(m => (
-                <MatchCard key={m.id} match={m} onPredictionSaved={load} />
-              ))}
-            </div>
+            {/* Sub-agrupar por grupo dentro del día */}
+            {(() => {
+              const byGroup = {};
+              dayMatches.forEach(m => {
+                const g = m.group_name || m.stage;
+                if (!byGroup[g]) byGroup[g] = [];
+                byGroup[g].push(m);
+              });
+              return Object.entries(byGroup).map(([groupName, gMatches]) => (
+                <div key={groupName} className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">{groupName}</span>
+                    <div className="flex-1 h-px bg-gray-700/60"></div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {gMatches.map(m => (
+                      <MatchCard key={m.id} match={m} onPredictionSaved={load} />
+                    ))}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         ))
       )}
