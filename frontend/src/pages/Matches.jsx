@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../api';
 
 const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
@@ -138,6 +138,7 @@ export default function Matches() {
   const [matches, setMatches]   = useState([]);
   const [loading, setLoading]   = useState(true);
   const [filter, setFilter]     = useState('all'); // all | pending | finished
+  const [showGroups, setShowGroups] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -178,6 +179,18 @@ export default function Matches() {
   const correctCount = matches.filter(m => m.is_finished && m.prediction?.points === 1).length;
   const wrongCount = matches.filter(m => m.is_finished && m.prediction?.points === 0 && m.prediction).length;
 
+  // Derivar equipos por grupo (solo Fase de Grupos)
+  const groupTeams = useMemo(() => {
+    const g = {};
+    matches.forEach(m => {
+      if (!m.group_name) return;
+      if (!g[m.group_name]) g[m.group_name] = new Map();
+      g[m.group_name].set(m.home_team, m.home_flag);
+      g[m.group_name].set(m.away_team, m.away_flag);
+    });
+    return g;
+  }, [matches]);
+
   if (loading) return (
     <div className="flex items-center justify-center h-64 text-green-400 text-xl">
       Cargando partidos...
@@ -204,6 +217,36 @@ export default function Matches() {
           </div>
         </div>
       </div>
+
+      {/* Grupos */}
+      {Object.keys(groupTeams).length > 0 && (
+        <div className="card mb-6 p-0 overflow-hidden">
+          <button
+            onClick={() => setShowGroups(g => !g)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-700/40 transition-colors"
+          >
+            <span>🌍 Grupos — Fase de Grupos</span>
+            <span className="text-gray-500 text-xs">{showGroups ? '▲ Ocultar' : '▼ Ver equipos'}</span>
+          </button>
+          {showGroups && (
+            <div className="border-t border-gray-700/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-700/50">
+              {Object.entries(groupTeams).sort().map(([groupName, teamsMap]) => (
+                <div key={groupName} className="px-4 py-3">
+                  <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">{groupName}</div>
+                  <div className="space-y-1">
+                    {[...teamsMap.entries()].map(([team, flag]) => (
+                      <div key={team} className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-base leading-none">{flag}</span>
+                        <span>{team}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6">
