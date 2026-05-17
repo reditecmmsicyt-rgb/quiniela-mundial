@@ -34,11 +34,8 @@ function MatchCard({ match, onPredictionSaved }) {
     }
   }
 
-  function formatDate(d) {
-    return new Date(d).toLocaleString('es-MX', {
-      weekday: 'short', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    });
+  function formatTime(d) {
+    return new Date(d).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
   }
 
   function pointsBadge(pts) {
@@ -48,9 +45,9 @@ function MatchCard({ match, onPredictionSaved }) {
 
   return (
     <div className={`card ${match.is_finished ? 'border-gray-600' : started ? 'border-orange-700/50' : 'border-gray-700'}`}>
-      {/* Date + Stage */}
+      {/* Time + Group + Status */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-gray-400">{formatDate(match.match_date)}</span>
+        <span className="text-xs text-gray-400 font-semibold">{formatTime(match.match_date)} · {match.group_name}</span>
         <div className="flex gap-2 items-center">
           {match.is_finished && <span className="badge bg-green-900/40 text-green-400">Finalizado</span>}
           {!match.is_finished && started && <span className="badge bg-orange-900/40 text-orange-400">En juego</span>}
@@ -161,13 +158,18 @@ export default function Matches() {
     return true;
   });
 
-  // Group by group_name
-  const groups = {};
+  // Agrupar por día (YYYY-MM-DD) en orden cronológico
+  const days = {};
   filtered.forEach(m => {
-    const g = m.group_name || m.stage || 'Sin grupo';
-    if (!groups[g]) groups[g] = [];
-    groups[g].push(m);
+    const day = m.match_date.slice(0, 10);
+    if (!days[day]) days[day] = [];
+    days[day].push(m);
   });
+
+  function formatDayHeader(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
 
   const totalPts = matches
     .filter(m => m.is_finished && m.prediction)
@@ -218,18 +220,30 @@ export default function Matches() {
         ))}
       </div>
 
-      {/* Matches grouped */}
-      {Object.keys(groups).length === 0 ? (
+      {/* Matches grouped by day */}
+      {Object.keys(days).length === 0 ? (
         <div className="text-center text-gray-400 py-12">No hay partidos en esta categoría</div>
       ) : (
-        Object.entries(groups).map(([groupName, groupMatches]) => (
-          <div key={groupName} className="mb-8">
-            <h2 className="text-lg font-bold text-green-400 mb-3 flex items-center gap-2">
-              <span className="w-1 h-5 bg-green-500 rounded-full inline-block"></span>
-              {groupName}
-            </h2>
+        Object.entries(days).map(([day, dayMatches]) => (
+          <div key={day} className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex-shrink-0 bg-gradient-to-br from-emerald-700 to-green-600 rounded-lg px-3 py-1.5 text-center shadow-lg shadow-green-900/30">
+                <div className="text-xs text-emerald-200 uppercase tracking-wider font-semibold">
+                  {new Date(day + 'T12:00:00').toLocaleDateString('es-MX', { month: 'short' })}
+                </div>
+                <div className="text-2xl font-black text-white leading-none">
+                  {new Date(day + 'T12:00:00').getDate()}
+                </div>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white capitalize">
+                  {formatDayHeader(day)}
+                </h2>
+                <p className="text-xs text-gray-400">{dayMatches.length} partido{dayMatches.length > 1 ? 's' : ''}</p>
+              </div>
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              {groupMatches.map(m => (
+              {dayMatches.map(m => (
                 <MatchCard key={m.id} match={m} onPredictionSaved={load} />
               ))}
             </div>
