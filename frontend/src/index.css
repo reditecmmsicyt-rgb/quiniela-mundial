@@ -4,30 +4,69 @@
 
 @layer base {
   body {
-    @apply bg-gray-950 text-gray-100 min-h-screen;
+    @apply text-gray-100 min-h-screen;
+    background-color: #07090f;
+    background-image:
+      radial-gradient(ellipse at 15% 40%, rgba(16, 185, 129, 0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(251, 191, 36, 0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 30% 90%, rgba(139, 92, 246, 0.07) 0%, transparent 45%);
+    background-attachment: fixed;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400
+           text-white font-bold py-2 px-4 rounded-lg transition-all shadow-lg shadow-green-900/30
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors;
+    @apply bg-gray-700/80 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors border border-gray-600;
   }
   .btn-danger {
     @apply bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors;
   }
   .card {
-    @apply bg-gray-800 rounded-xl border border-gray-700 p-4;
+    @apply bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700/60 p-4
+           shadow-xl shadow-black/30;
   }
   .input {
-    @apply bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder-gray-400;
+    @apply bg-gray-800/80 border border-gray-600 text-white rounded-lg px-3 py-2 w-full
+           focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
+           placeholder-gray-500;
   }
   .score-input {
-    @apply bg-gray-700 border border-gray-600 text-white text-center text-xl font-bold rounded-lg w-14 h-12 focus:outline-none focus:ring-2 focus:ring-green-500;
+    @apply bg-gray-800 border border-gray-600 text-white text-center text-xl font-bold
+           rounded-lg w-14 h-12 focus:outline-none focus:ring-2 focus:ring-emerald-500;
   }
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* Título principal con degradado dorado */
+  .title-gradient {
+    @apply bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent;
+  }
+
+  /* Borde festivo para tarjetas destacadas */
+  .card-festive {
+    @apply bg-gray-900/80 backdrop-blur-sm rounded-xl p-4 shadow-xl shadow-black/30;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+  .card-festive::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(251,191,36,0.4), rgba(16,185,129,0.3), rgba(239,68,68,0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }

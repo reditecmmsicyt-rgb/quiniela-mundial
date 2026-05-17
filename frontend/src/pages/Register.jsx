@@ -28,16 +28,21 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
+    <div className="min-h-[88vh] flex items-center justify-center">
       <div className="w-full max-w-md">
+
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">⚽</div>
-          <h1 className="text-3xl font-bold text-white">Quiniela</h1>
-          <p className="text-gray-400 mt-1">Mundial 2026</p>
+          <div className="text-7xl mb-3 drop-shadow-lg">⚽</div>
+          <h1 className="text-4xl font-black bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent tracking-tight">
+            Liguilla Mundialista
+          </h1>
+          <p className="text-emerald-400 font-semibold mt-1 tracking-widest text-sm uppercase">
+            FIFA World Cup 2026
+          </p>
         </div>
 
-        <div className="card">
-          <h2 className="text-xl font-bold mb-6 text-center">Crear Cuenta</h2>
+        <div className="card-festive">
+          <h2 className="text-xl font-bold mb-6 text-center text-gray-100">Crear Cuenta</h2>
 
           {error && (
             <div className="bg-red-900/40 border border-red-700 text-red-300 rounded-lg px-4 py-3 mb-4 text-sm">
@@ -79,18 +84,22 @@ export default function Register() {
                 required
               />
             </div>
-            <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
-              {loading ? 'Registrando...' : 'Crear cuenta'}
+            <button type="submit" className="btn-primary w-full mt-2 py-3 text-base" disabled={loading}>
+              {loading ? 'Registrando...' : 'Unirme al torneo →'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-400 mt-4">
+          <p className="text-center text-sm text-gray-400 mt-5">
             ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="text-green-400 hover:text-green-300 font-medium">
+            <Link to="/login" className="text-amber-400 hover:text-amber-300 font-semibold">
               Inicia sesión
             </Link>
           </p>
         </div>
+
+        <p className="text-center text-xs text-gray-600 mt-6">
+          🇲🇽 México · 🇺🇸 USA · 🇨🇦 Canadá — Junio/Julio 2026
+        </p>
       </div>
     </div>
   );
