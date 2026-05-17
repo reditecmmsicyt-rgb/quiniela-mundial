@@ -75,6 +75,30 @@ router.put('/matches/:id/result', (req, res) => {
   res.json(db.prepare('SELECT * FROM matches WHERE id = ?').get(id));
 });
 
+// Solo para pruebas: inserta predicciones aleatorias para todos los usuarios no-admin
+router.post('/matches/:id/seed-predictions', (req, res) => {
+  const { id } = req.params;
+  const match = db.prepare('SELECT * FROM matches WHERE id = ?').get(id);
+  if (!match) return res.status(404).json({ error: 'Partido no encontrado' });
+
+  const users = db.prepare('SELECT id FROM users WHERE is_admin = 0').all();
+  const options = ['L', 'E', 'V'];
+  const insert = db.prepare(`
+    INSERT INTO predictions (user_id, match_id, result)
+    VALUES (?, ?, ?)
+    ON CONFLICT(user_id, match_id) DO UPDATE SET result = excluded.result
+  `);
+
+  db.transaction(() => {
+    users.forEach(u => {
+      const result = options[Math.floor(Math.random() * 3)];
+      insert.run(u.id, id, result);
+    });
+  })();
+
+  res.json({ seeded: users.length, match_id: parseInt(id) });
+});
+
 router.delete('/matches/:id', (req, res) => {
   const { id } = req.params;
   if (!db.prepare('SELECT id FROM matches WHERE id = ?').get(id)) {

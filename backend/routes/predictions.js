@@ -39,7 +39,7 @@ router.get('/public', authenticate, (req, res) => {
   // Solo partidos que ya están bloqueados (arrancaron o faltan ≤5 min)
   const allMatches = db.prepare('SELECT * FROM matches ORDER BY match_date ASC').all();
   const lockedIds = allMatches
-    .filter(m => new Date(m.match_date).getTime() - now.getTime() < 5 * 60 * 1000)
+    .filter(m => m.is_finished || new Date(m.match_date).getTime() - now.getTime() < 5 * 60 * 1000)
     .map(m => m.id);
 
   if (lockedIds.length === 0) return res.json({ users: [], matches: [], predictions: {} });
