@@ -292,6 +292,8 @@ export default function Admin() {
   const [userModal, setUserModal]     = useState(null);
   const [resetModal, setResetModal]   = useState(null);
   const [deleting, setDeleting]       = useState(null);
+  const [seeding, setSeeding]         = useState(null);
+  const [seedMsg, setSeedMsg]         = useState('');
 
   const loadMatches = useCallback(async () => {
     setLoadingM(true);
@@ -309,6 +311,20 @@ export default function Admin() {
 
   useEffect(() => { loadMatches(); }, [loadMatches]);
   useEffect(() => { if (tab === 'users') loadUsers(); }, [tab, loadUsers]);
+
+  async function handleSeed(id) {
+    setSeeding(id);
+    setSeedMsg('');
+    try {
+      const res = await api.post(`/admin/matches/${id}/seed-predictions`);
+      setSeedMsg(`✅ ${res.seeded} predicciones sembradas`);
+      setTimeout(() => setSeedMsg(''), 4000);
+    } catch (e) {
+      setSeedMsg(`❌ ${e.message}`);
+    } finally {
+      setSeeding(null);
+    }
+  }
 
   async function handleDelete(id) {
     if (!confirm('¿Eliminar este partido? Se borrarán todas las predicciones asociadas.')) return;
@@ -340,7 +356,10 @@ export default function Admin() {
         <>
           <AddMatchForm onAdded={loadMatches} />
 
-          <h3 className="font-bold text-lg mb-3">Lista de Partidos</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-lg">Lista de Partidos</h3>
+            {seedMsg && <span className="text-sm">{seedMsg}</span>}
+          </div>
           {loadingM ? (
             <div className="text-gray-400 text-center py-8">Cargando...</div>
           ) : (
@@ -363,7 +382,15 @@ export default function Admin() {
                       {m.stage} · {formatDate(m.match_date)}
                     </div>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                    <button
+                      onClick={() => handleSeed(m.id)}
+                      className="bg-purple-700/60 hover:bg-purple-600/80 border border-purple-600/50 text-purple-200 text-xs py-1.5 px-3 rounded-lg transition-colors"
+                      disabled={seeding === m.id}
+                      title="Insertar predicciones aleatorias de prueba para todos los usuarios"
+                    >
+                      {seeding === m.id ? '...' : '🎲 Sembrar'}
+                    </button>
                     <button
                       onClick={() => setModal(m)}
                       className="btn-primary text-xs py-1.5 px-3"
