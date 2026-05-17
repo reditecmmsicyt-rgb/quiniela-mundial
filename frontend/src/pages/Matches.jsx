@@ -226,7 +226,7 @@ export default function Matches() {
             className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-700/40 transition-colors"
           >
             <span>🌍 Grupos — Fase de Grupos</span>
-            <span className="text-gray-500 text-xs">{showGroups ? '▲ Ocultar' : '▼ Ver equipos'}</span>
+            <span className="text-emerald-400 text-xs font-semibold">{showGroups ? '▲ Ocultar' : '▼ Ver equipos'}</span>
           </button>
           {showGroups && (
             <div className="border-t border-gray-700/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-700/50">
