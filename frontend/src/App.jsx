@@ -8,6 +8,7 @@ import Matches from './pages/Matches';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import Payment from './pages/Payment';
+import PublicPredictions from './pages/PublicPredictions';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -44,7 +45,8 @@ function AppRoutes() {
           <Route path="/partidos"    element={<ProtectedRoute><Matches /></ProtectedRoute>} />
           <Route path="/tabla"       element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
           <Route path="/pago"        element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-          <Route path="/admin"       element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/admin"         element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/predicciones" element={<ProtectedRoute><PublicPredictions /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

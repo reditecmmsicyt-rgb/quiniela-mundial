@@ -43,9 +43,10 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            <NavLink to="/partidos" className={linkClass}>⚽ Partidos</NavLink>
-            <NavLink to="/tabla"    className={linkClass}>🏅 Tabla</NavLink>
-            <NavLink to="/pago"     className={linkClass}>💳 Pago</NavLink>
+            <NavLink to="/partidos"     className={linkClass}>⚽ Partidos</NavLink>
+            <NavLink to="/predicciones" className={linkClass}>👁️ Predicciones</NavLink>
+            <NavLink to="/tabla"        className={linkClass}>🏅 Tabla</NavLink>
+            <NavLink to="/pago"         className={linkClass}>💳 Pago</NavLink>
             {user?.is_admin && <NavLink to="/admin" className={linkClass}>⚙️ Admin</NavLink>}
           </div>
 
@@ -74,9 +75,10 @@ export default function Navbar() {
         {/* Mobile menu */}
         {open && (
           <div className="md:hidden pb-3 space-y-1 border-t border-gray-700/50 pt-2">
-            <NavLink to="/partidos" className={linkClass} onClick={() => setOpen(false)}>⚽ Partidos</NavLink>
-            <NavLink to="/tabla"    className={linkClass} onClick={() => setOpen(false)}>🏅 Tabla</NavLink>
-            <NavLink to="/pago"     className={linkClass} onClick={() => setOpen(false)}>💳 Pago</NavLink>
+            <NavLink to="/partidos"     className={linkClass} onClick={() => setOpen(false)}>⚽ Partidos</NavLink>
+            <NavLink to="/predicciones" className={linkClass} onClick={() => setOpen(false)}>👁️ Predicciones</NavLink>
+            <NavLink to="/tabla"        className={linkClass} onClick={() => setOpen(false)}>🏅 Tabla</NavLink>
+            <NavLink to="/pago"         className={linkClass} onClick={() => setOpen(false)}>💳 Pago</NavLink>
             {user?.is_admin && <NavLink to="/admin" className={linkClass} onClick={() => setOpen(false)}>⚙️ Admin</NavLink>}
             <div className="pt-2 flex items-center justify-between border-t border-gray-700/40 mt-2">
               <span className="text-sm text-gray-400 px-3">@{user?.username}</span>
