@@ -75,6 +75,19 @@ router.put('/matches/:id/result', (req, res) => {
   res.json(db.prepare('SELECT * FROM matches WHERE id = ?').get(id));
 });
 
+router.delete('/matches/:id/result', (req, res) => {
+  const { id } = req.params;
+  const match = db.prepare('SELECT * FROM matches WHERE id = ?').get(id);
+  if (!match) return res.status(404).json({ error: 'Partido no encontrado' });
+
+  db.transaction(() => {
+    db.prepare('UPDATE matches SET home_score = NULL, away_score = NULL, is_finished = 0 WHERE id = ?').run(id);
+    db.prepare('UPDATE predictions SET points = NULL WHERE match_id = ?').run(id);
+  })();
+
+  res.json(db.prepare('SELECT * FROM matches WHERE id = ?').get(id));
+});
+
 // Solo para pruebas: inserta predicciones aleatorias para todos los usuarios no-admin
 router.post('/matches/:id/seed-predictions', (req, res) => {
   const { id } = req.params;
