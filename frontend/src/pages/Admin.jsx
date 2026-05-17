@@ -3,6 +3,69 @@ import { api } from '../api';
 
 const RESULT_LABEL = { L: 'Local', E: 'Empate', V: 'Visitante' };
 
+function ResetPasswordModal({ user, onClose }) {
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm]   = useState('');
+  const [saving, setSaving]     = useState(false);
+  const [msg, setMsg]           = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (password !== confirm) { setMsg('Las contraseñas no coinciden'); return; }
+    setSaving(true);
+    setMsg('');
+    try {
+      await api.put(`/admin/users/${user.id}/password`, { password });
+      setMsg('✅ Contraseña actualizada');
+      setPassword(''); setConfirm('');
+    } catch (err) {
+      setMsg('❌ ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="card w-full max-w-sm">
+        <h3 className="font-bold text-lg mb-1">Resetear contraseña</h3>
+        <p className="text-sm text-gray-400 mb-4">{user.username} · {user.email}</p>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Nueva contraseña</label>
+            <input
+              className="input w-full"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Confirmar contraseña</label>
+            <input
+              className="input w-full"
+              type="password"
+              placeholder="Repite la contraseña"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              required
+            />
+          </div>
+          {msg && <p className="text-sm">{msg}</p>}
+          <div className="flex gap-2 pt-1">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cerrar</button>
+            <button type="submit" className="btn-primary flex-1" disabled={saving}>
+              {saving ? 'Guardando...' : 'Confirmar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function UserPredictionsModal({ user, onClose }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -225,9 +288,10 @@ export default function Admin() {
   const [users, setUsers]       = useState([]);
   const [loadingM, setLoadingM] = useState(true);
   const [loadingU, setLoadingU] = useState(false);
-  const [modal, setModal]           = useState(null);
-  const [userModal, setUserModal]   = useState(null);
-  const [deleting, setDeleting]     = useState(null);
+  const [modal, setModal]             = useState(null);
+  const [userModal, setUserModal]     = useState(null);
+  const [resetModal, setResetModal]   = useState(null);
+  const [deleting, setDeleting]       = useState(null);
 
   const loadMatches = useCallback(async () => {
     setLoadingM(true);
@@ -351,14 +415,22 @@ export default function Admin() {
                       {new Date(u.created_at).toLocaleDateString('es-MX')}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      {!u.is_admin && (
+                      <div className="flex gap-3 justify-end">
+                        {!u.is_admin && (
+                          <button
+                            onClick={() => setUserModal(u)}
+                            className="text-xs text-green-400 hover:text-green-300 underline"
+                          >
+                            Ver predicciones
+                          </button>
+                        )}
                         <button
-                          onClick={() => setUserModal(u)}
-                          className="text-xs text-green-400 hover:text-green-300 underline"
+                          onClick={() => setResetModal(u)}
+                          className="text-xs text-yellow-400 hover:text-yellow-300 underline"
                         >
-                          Ver predicciones
+                          Reset contraseña
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -380,6 +452,13 @@ export default function Admin() {
         <UserPredictionsModal
           user={userModal}
           onClose={() => setUserModal(null)}
+        />
+      )}
+
+      {resetModal && (
+        <ResetPasswordModal
+          user={resetModal}
+          onClose={() => setResetModal(null)}
         />
       )}
     </div>

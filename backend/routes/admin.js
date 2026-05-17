@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const db = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
 
@@ -97,6 +98,19 @@ router.put('/users/:id/admin', (req, res) => {
   const { is_admin } = req.body;
   db.prepare('UPDATE users SET is_admin = ? WHERE id = ?').run(is_admin ? 1 : 0, id);
   res.json({ message: 'Rol actualizado' });
+});
+
+router.put('/users/:id/password', (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+  if (!password || password.length < 6) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+  }
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(id);
+  if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+  const hash = bcrypt.hashSync(password, 10);
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hash, id);
+  res.json({ message: 'Contraseña actualizada' });
 });
 
 router.delete('/users/:id', (req, res) => {
