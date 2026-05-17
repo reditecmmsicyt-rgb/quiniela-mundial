@@ -34,7 +34,7 @@ export default function Register() {
         <div className="text-center mb-8">
           <div className="text-7xl mb-3 drop-shadow-lg">⚽</div>
           <h1 className="text-4xl font-black bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent tracking-tight">
-            Liguilla Mundialista
+            Quiniela Mundialista
           </h1>
           <p className="text-emerald-400 font-semibold mt-1 tracking-widest text-sm uppercase">
             FIFA World Cup 2026

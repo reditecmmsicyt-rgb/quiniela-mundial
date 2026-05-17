@@ -33,7 +33,7 @@ export default function Navbar() {
             <span className="text-2xl">🏆</span>
             <div className="leading-tight">
               <div className="font-black text-base sm:text-lg bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent tracking-tight">
-                Liguilla Mundialista
+                Quiniela Mundialista
               </div>
               <div className="text-xs text-emerald-500 font-semibold tracking-widest uppercase hidden sm:block">
                 FIFA World Cup 2026
