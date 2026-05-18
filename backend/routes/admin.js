@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
 const { authenticate, requireAdmin } = require('../middleware/auth');
+const { matches: officialMatches } = require('../seed');
 
 const router = express.Router();
 router.use(authenticate, requireAdmin);
@@ -182,6 +183,25 @@ router.get('/users/:id/predictions', (req, res) => {
   `).all(id);
 
   res.json({ user, predictions });
+});
+
+// Borra todos los partidos y predicciones, e inserta el calendario oficial
+router.post('/reset-matches', (req, res) => {
+  const stmt = db.prepare(`
+    INSERT INTO matches (home_team, away_team, home_flag, away_flag, match_date, group_name, stage)
+    VALUES (?, ?, ?, ?, ?, ?, 'Fase de Grupos')
+  `);
+
+  db.transaction(() => {
+    db.prepare('DELETE FROM predictions').run();
+    db.prepare('DELETE FROM matches').run();
+    db.prepare("DELETE FROM sqlite_sequence WHERE name IN ('matches','predictions')").run();
+    for (const m of officialMatches) {
+      stmt.run(m.home, m.away, m.hf, m.af, m.date, m.group);
+    }
+  })();
+
+  res.json({ message: `${officialMatches.length} partidos reinstalados`, total: officialMatches.length });
 });
 
 // Migración única: convierte fechas CDT→UTC (+6h) en partidos sin sufijo Z
