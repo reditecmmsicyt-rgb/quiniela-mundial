@@ -5,100 +5,100 @@ const db = require('./db');
 // Horarios en UTC (hora México CDT = UTC-6, se suma +6h)
 const matches = [
   // ── Grupo A ──────────────────────────────────────────────────────────────
-  { home: 'México',          hf: '🇲🇽', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-11T19:00Z', group: 'Grupo A' }, // 1:00 PM CDT
-  { home: 'Corea del Sur',   hf: '🇰🇷', away: 'República Checa',  af: '🇨🇿', date: '2026-06-12T02:00Z', group: 'Grupo A' }, // 8:00 PM CDT
-  { home: 'República Checa', hf: '🇨🇿', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-18T16:00Z', group: 'Grupo A' }, // 10:00 AM CDT
-  { home: 'México',          hf: '🇲🇽', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-19T01:00Z', group: 'Grupo A' }, // 7:00 PM CDT
-  { home: 'República Checa', hf: '🇨🇿', away: 'México',           af: '🇲🇽', date: '2026-06-25T01:00Z', group: 'Grupo A' }, // 7:00 PM CDT
-  { home: 'Sudáfrica',       hf: '🇿🇦', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-25T01:00Z', group: 'Grupo A' }, // 7:00 PM CDT
+  { home: 'México',          hf: '🇲🇽', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-11T18:00Z', group: 'Grupo A' }, // 1:00 PM CDT
+  { home: 'Corea del Sur',   hf: '🇰🇷', away: 'República Checa',  af: '🇨🇿', date: '2026-06-12T01:00Z', group: 'Grupo A' }, // 8:00 PM CDT
+  { home: 'República Checa', hf: '🇨🇿', away: 'Sudáfrica',        af: '🇿🇦', date: '2026-06-18T15:00Z', group: 'Grupo A' }, // 10:00 AM CDT
+  { home: 'México',          hf: '🇲🇽', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-19T00:00Z', group: 'Grupo A' }, // 7:00 PM CDT
+  { home: 'República Checa', hf: '🇨🇿', away: 'México',           af: '🇲🇽', date: '2026-06-25T00:00Z', group: 'Grupo A' }, // 7:00 PM CDT
+  { home: 'Sudáfrica',       hf: '🇿🇦', away: 'Corea del Sur',    af: '🇰🇷', date: '2026-06-25T00:00Z', group: 'Grupo A' }, // 7:00 PM CDT
 
   // ── Grupo B ──────────────────────────────────────────────────────────────
-  { home: 'Canadá',  hf: '🇨🇦', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-12T19:00Z', group: 'Grupo B' }, // 1:00 PM CDT
-  { home: 'Catar',   hf: '🇶🇦', away: 'Suiza',   af: '🇨🇭', date: '2026-06-13T19:00Z', group: 'Grupo B' }, // 1:00 PM CDT
-  { home: 'Suiza',   hf: '🇨🇭', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-18T19:00Z', group: 'Grupo B' }, // 1:00 PM CDT
-  { home: 'Canadá',  hf: '🇨🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-18T22:00Z', group: 'Grupo B' }, // 4:00 PM CDT
-  { home: 'Suiza',   hf: '🇨🇭', away: 'Canadá',  af: '🇨🇦', date: '2026-06-24T19:00Z', group: 'Grupo B' }, // 1:00 PM CDT
-  { home: 'Bosnia',  hf: '🇧🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-24T19:00Z', group: 'Grupo B' }, // 1:00 PM CDT
+  { home: 'Canadá',  hf: '🇨🇦', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-12T18:00Z', group: 'Grupo B' }, // 1:00 PM CDT
+  { home: 'Catar',   hf: '🇶🇦', away: 'Suiza',   af: '🇨🇭', date: '2026-06-13T18:00Z', group: 'Grupo B' }, // 1:00 PM CDT
+  { home: 'Suiza',   hf: '🇨🇭', away: 'Bosnia',  af: '🇧🇦', date: '2026-06-18T18:00Z', group: 'Grupo B' }, // 1:00 PM CDT
+  { home: 'Canadá',  hf: '🇨🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-18T21:00Z', group: 'Grupo B' }, // 4:00 PM CDT
+  { home: 'Suiza',   hf: '🇨🇭', away: 'Canadá',  af: '🇨🇦', date: '2026-06-24T18:00Z', group: 'Grupo B' }, // 1:00 PM CDT
+  { home: 'Bosnia',  hf: '🇧🇦', away: 'Catar',   af: '🇶🇦', date: '2026-06-24T18:00Z', group: 'Grupo B' }, // 1:00 PM CDT
 
   // ── Grupo C ──────────────────────────────────────────────────────────────
-  { home: 'Brasil',    hf: '🇧🇷', away: 'Marruecos', af: '🇲🇦', date: '2026-06-13T22:00Z', group: 'Grupo C' }, // 4:00 PM CDT
-  { home: 'Haití',     hf: '🇭🇹', away: 'Escocia',   af: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', date: '2026-06-14T01:00Z', group: 'Grupo C' }, // 7:00 PM CDT
-  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Marruecos', af: '🇲🇦', date: '2026-06-19T22:00Z', group: 'Grupo C' }, // 4:00 PM CDT
-  { home: 'Brasil',    hf: '🇧🇷', away: 'Haití',     af: '🇭🇹', date: '2026-06-20T00:30Z', group: 'Grupo C' }, // 6:30 PM CDT
-  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Brasil',    af: '🇧🇷', date: '2026-06-24T22:00Z', group: 'Grupo C' }, // 4:00 PM CDT
-  { home: 'Marruecos', hf: '🇲🇦', away: 'Haití',     af: '🇭🇹', date: '2026-06-24T22:00Z', group: 'Grupo C' }, // 4:00 PM CDT
+  { home: 'Brasil',    hf: '🇧🇷', away: 'Marruecos', af: '🇲🇦', date: '2026-06-13T21:00Z', group: 'Grupo C' }, // 4:00 PM CDT
+  { home: 'Haití',     hf: '🇭🇹', away: 'Escocia',   af: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', date: '2026-06-14T00:00Z', group: 'Grupo C' }, // 7:00 PM CDT
+  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Marruecos', af: '🇲🇦', date: '2026-06-19T21:00Z', group: 'Grupo C' }, // 4:00 PM CDT
+  { home: 'Brasil',    hf: '🇧🇷', away: 'Haití',     af: '🇭🇹', date: '2026-06-19T23:30Z', group: 'Grupo C' }, // 6:30 PM CDT
+  { home: 'Escocia',   hf: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', away: 'Brasil',    af: '🇧🇷', date: '2026-06-24T21:00Z', group: 'Grupo C' }, // 4:00 PM CDT
+  { home: 'Marruecos', hf: '🇲🇦', away: 'Haití',     af: '🇭🇹', date: '2026-06-24T21:00Z', group: 'Grupo C' }, // 4:00 PM CDT
 
   // ── Grupo D ──────────────────────────────────────────────────────────────
-  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-13T01:00Z', group: 'Grupo D' }, // 7:00 PM CDT jun 12
-  { home: 'Australia',      hf: '🇦🇺', away: 'Turquía',   af: '🇹🇷', date: '2026-06-15T04:00Z', group: 'Grupo D' }, // 10:00 PM CDT jun 14
-  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Australia', af: '🇦🇺', date: '2026-06-19T19:00Z', group: 'Grupo D' }, // 1:00 PM CDT
-  { home: 'Turquía',        hf: '🇹🇷', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-20T03:00Z', group: 'Grupo D' }, // 9:00 PM CDT
-  { home: 'Turquía',        hf: '🇹🇷', away: 'Estados Unidos', af: '🇺🇸', date: '2026-06-26T02:00Z', group: 'Grupo D' }, // 8:00 PM CDT jun 25
-  { home: 'Paraguay',       hf: '🇵🇾', away: 'Australia', af: '🇦🇺', date: '2026-06-26T02:00Z', group: 'Grupo D' }, // 8:00 PM CDT jun 25
+  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-13T00:00Z', group: 'Grupo D' }, // 7:00 PM CDT jun 12
+  { home: 'Australia',      hf: '🇦🇺', away: 'Turquía',   af: '🇹🇷', date: '2026-06-14T03:00Z', group: 'Grupo D' }, // 10:00 PM CDT jun 13
+  { home: 'Estados Unidos', hf: '🇺🇸', away: 'Australia', af: '🇦🇺', date: '2026-06-19T18:00Z', group: 'Grupo D' }, // 1:00 PM CDT
+  { home: 'Turquía',        hf: '🇹🇷', away: 'Paraguay',  af: '🇵🇾', date: '2026-06-20T02:00Z', group: 'Grupo D' }, // 9:00 PM CDT
+  { home: 'Turquía',        hf: '🇹🇷', away: 'Estados Unidos', af: '🇺🇸', date: '2026-06-26T01:00Z', group: 'Grupo D' }, // 8:00 PM CDT jun 25
+  { home: 'Paraguay',       hf: '🇵🇾', away: 'Australia', af: '🇦🇺', date: '2026-06-26T01:00Z', group: 'Grupo D' }, // 8:00 PM CDT jun 25
 
   // ── Grupo E ──────────────────────────────────────────────────────────────
-  { home: 'Alemania',        hf: '🇩🇪', away: 'Curazao',         af: '🇨🇼', date: '2026-06-14T17:00Z', group: 'Grupo E' }, // 11:00 AM CDT
-  { home: 'Costa de Marfil', hf: '🇨🇮', away: 'Ecuador',         af: '🇪🇨', date: '2026-06-14T23:00Z', group: 'Grupo E' }, // 5:00 PM CDT
-  { home: 'Alemania',        hf: '🇩🇪', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-20T20:00Z', group: 'Grupo E' }, // 2:00 PM CDT
-  { home: 'Ecuador',         hf: '🇪🇨', away: 'Curazao',         af: '🇨🇼', date: '2026-06-21T00:00Z', group: 'Grupo E' }, // 6:00 PM CDT
-  { home: 'Curazao',         hf: '🇨🇼', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-25T20:00Z', group: 'Grupo E' }, // 2:00 PM CDT
-  { home: 'Ecuador',         hf: '🇪🇨', away: 'Alemania',        af: '🇩🇪', date: '2026-06-25T20:00Z', group: 'Grupo E' }, // 2:00 PM CDT
+  { home: 'Alemania',        hf: '🇩🇪', away: 'Curazao',         af: '🇨🇼', date: '2026-06-14T16:00Z', group: 'Grupo E' }, // 11:00 AM CDT
+  { home: 'Costa de Marfil', hf: '🇨🇮', away: 'Ecuador',         af: '🇪🇨', date: '2026-06-14T22:00Z', group: 'Grupo E' }, // 5:00 PM CDT
+  { home: 'Alemania',        hf: '🇩🇪', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-20T19:00Z', group: 'Grupo E' }, // 2:00 PM CDT
+  { home: 'Ecuador',         hf: '🇪🇨', away: 'Curazao',         af: '🇨🇼', date: '2026-06-20T23:00Z', group: 'Grupo E' }, // 6:00 PM CDT
+  { home: 'Curazao',         hf: '🇨🇼', away: 'Costa de Marfil', af: '🇨🇮', date: '2026-06-25T19:00Z', group: 'Grupo E' }, // 2:00 PM CDT
+  { home: 'Ecuador',         hf: '🇪🇨', away: 'Alemania',        af: '🇩🇪', date: '2026-06-25T19:00Z', group: 'Grupo E' }, // 2:00 PM CDT
 
   // ── Grupo F ──────────────────────────────────────────────────────────────
-  { home: 'Países Bajos', hf: '🇳🇱', away: 'Japón',        af: '🇯🇵', date: '2026-06-14T20:00Z', group: 'Grupo F' }, // 2:00 PM CDT
-  { home: 'Suecia',       hf: '🇸🇪', away: 'Túnez',        af: '🇹🇳', date: '2026-06-15T02:00Z', group: 'Grupo F' }, // 8:00 PM CDT
-  { home: 'Países Bajos', hf: '🇳🇱', away: 'Suecia',       af: '🇸🇪', date: '2026-06-20T17:00Z', group: 'Grupo F' }, // 11:00 AM CDT
-  { home: 'Túnez',        hf: '🇹🇳', away: 'Japón',        af: '🇯🇵', date: '2026-06-21T04:00Z', group: 'Grupo F' }, // 10:00 PM CDT
-  { home: 'Japón',        hf: '🇯🇵', away: 'Suecia',       af: '🇸🇪', date: '2026-06-25T23:00Z', group: 'Grupo F' }, // 5:00 PM CDT
-  { home: 'Túnez',        hf: '🇹🇳', away: 'Países Bajos', af: '🇳🇱', date: '2026-06-25T23:00Z', group: 'Grupo F' }, // 5:00 PM CDT
+  { home: 'Países Bajos', hf: '🇳🇱', away: 'Japón',        af: '🇯🇵', date: '2026-06-14T19:00Z', group: 'Grupo F' }, // 2:00 PM CDT
+  { home: 'Suecia',       hf: '🇸🇪', away: 'Túnez',        af: '🇹🇳', date: '2026-06-15T01:00Z', group: 'Grupo F' }, // 8:00 PM CDT
+  { home: 'Países Bajos', hf: '🇳🇱', away: 'Suecia',       af: '🇸🇪', date: '2026-06-20T16:00Z', group: 'Grupo F' }, // 11:00 AM CDT
+  { home: 'Túnez',        hf: '🇹🇳', away: 'Japón',        af: '🇯🇵', date: '2026-06-21T03:00Z', group: 'Grupo F' }, // 10:00 PM CDT
+  { home: 'Japón',        hf: '🇯🇵', away: 'Suecia',       af: '🇸🇪', date: '2026-06-25T22:00Z', group: 'Grupo F' }, // 5:00 PM CDT
+  { home: 'Túnez',        hf: '🇹🇳', away: 'Países Bajos', af: '🇳🇱', date: '2026-06-25T22:00Z', group: 'Grupo F' }, // 5:00 PM CDT
 
   // ── Grupo G ──────────────────────────────────────────────────────────────
-  { home: 'Bélgica',       hf: '🇧🇪', away: 'Egipto',        af: '🇪🇬', date: '2026-06-15T19:00Z', group: 'Grupo G' }, // 1:00 PM CDT
-  { home: 'Irán',          hf: '🇮🇷', away: 'Nueva Zelanda', af: '🇳🇿', date: '2026-06-16T01:00Z', group: 'Grupo G' }, // 7:00 PM CDT
-  { home: 'Bélgica',       hf: '🇧🇪', away: 'Irán',          af: '🇮🇷', date: '2026-06-21T19:00Z', group: 'Grupo G' }, // 1:00 PM CDT
-  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Egipto',        af: '🇪🇬', date: '2026-06-22T01:00Z', group: 'Grupo G' }, // 7:00 PM CDT
-  { home: 'Egipto',        hf: '🇪🇬', away: 'Irán',          af: '🇮🇷', date: '2026-06-27T03:00Z', group: 'Grupo G' }, // 9:00 PM CDT jun 26
-  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Bélgica',       af: '🇧🇪', date: '2026-06-27T03:00Z', group: 'Grupo G' }, // 9:00 PM CDT jun 26
+  { home: 'Bélgica',       hf: '🇧🇪', away: 'Egipto',        af: '🇪🇬', date: '2026-06-15T18:00Z', group: 'Grupo G' }, // 1:00 PM CDT
+  { home: 'Irán',          hf: '🇮🇷', away: 'Nueva Zelanda', af: '🇳🇿', date: '2026-06-16T00:00Z', group: 'Grupo G' }, // 7:00 PM CDT
+  { home: 'Bélgica',       hf: '🇧🇪', away: 'Irán',          af: '🇮🇷', date: '2026-06-21T18:00Z', group: 'Grupo G' }, // 1:00 PM CDT
+  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Egipto',        af: '🇪🇬', date: '2026-06-22T00:00Z', group: 'Grupo G' }, // 7:00 PM CDT
+  { home: 'Egipto',        hf: '🇪🇬', away: 'Irán',          af: '🇮🇷', date: '2026-06-27T02:00Z', group: 'Grupo G' }, // 9:00 PM CDT jun 26
+  { home: 'Nueva Zelanda', hf: '🇳🇿', away: 'Bélgica',       af: '🇧🇪', date: '2026-06-27T02:00Z', group: 'Grupo G' }, // 9:00 PM CDT jun 26
 
   // ── Grupo H ──────────────────────────────────────────────────────────────
-  { home: 'España',         hf: '🇪🇸', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-15T16:00Z', group: 'Grupo H' }, // 10:00 AM CDT
-  { home: 'Arabia Saudita', hf: '🇸🇦', away: 'Uruguay',       af: '🇺🇾', date: '2026-06-15T22:00Z', group: 'Grupo H' }, // 4:00 PM CDT
-  { home: 'España',         hf: '🇪🇸', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-21T16:00Z', group: 'Grupo H' }, // 10:00 AM CDT
-  { home: 'Uruguay',        hf: '🇺🇾', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-21T22:00Z', group: 'Grupo H' }, // 4:00 PM CDT
-  { home: 'Cabo Verde',     hf: '🇨🇻', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-27T00:00Z', group: 'Grupo H' }, // 6:00 PM CDT jun 26
-  { home: 'Uruguay',        hf: '🇺🇾', away: 'España',        af: '🇪🇸', date: '2026-06-27T00:00Z', group: 'Grupo H' }, // 6:00 PM CDT jun 26
+  { home: 'España',         hf: '🇪🇸', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-15T15:00Z', group: 'Grupo H' }, // 10:00 AM CDT
+  { home: 'Arabia Saudita', hf: '🇸🇦', away: 'Uruguay',       af: '🇺🇾', date: '2026-06-15T21:00Z', group: 'Grupo H' }, // 4:00 PM CDT
+  { home: 'España',         hf: '🇪🇸', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-21T15:00Z', group: 'Grupo H' }, // 10:00 AM CDT
+  { home: 'Uruguay',        hf: '🇺🇾', away: 'Cabo Verde',    af: '🇨🇻', date: '2026-06-21T21:00Z', group: 'Grupo H' }, // 4:00 PM CDT
+  { home: 'Cabo Verde',     hf: '🇨🇻', away: 'Arabia Saudita',af: '🇸🇦', date: '2026-06-26T23:00Z', group: 'Grupo H' }, // 6:00 PM CDT jun 26
+  { home: 'Uruguay',        hf: '🇺🇾', away: 'España',        af: '🇪🇸', date: '2026-06-26T23:00Z', group: 'Grupo H' }, // 6:00 PM CDT jun 26
 
   // ── Grupo I ──────────────────────────────────────────────────────────────
-  { home: 'Francia',  hf: '🇫🇷', away: 'Senegal', af: '🇸🇳', date: '2026-06-16T19:00Z', group: 'Grupo I' }, // 1:00 PM CDT
-  { home: 'Irak',     hf: '🇮🇶', away: 'Noruega', af: '🇳🇴', date: '2026-06-16T22:00Z', group: 'Grupo I' }, // 4:00 PM CDT
-  { home: 'Francia',  hf: '🇫🇷', away: 'Irak',    af: '🇮🇶', date: '2026-06-22T21:00Z', group: 'Grupo I' }, // 3:00 PM CDT
-  { home: 'Noruega',  hf: '🇳🇴', away: 'Senegal', af: '🇸🇳', date: '2026-06-23T00:00Z', group: 'Grupo I' }, // 6:00 PM CDT
-  { home: 'Noruega',  hf: '🇳🇴', away: 'Francia', af: '🇫🇷', date: '2026-06-26T19:00Z', group: 'Grupo I' }, // 1:00 PM CDT
-  { home: 'Senegal',  hf: '🇸🇳', away: 'Irak',    af: '🇮🇶', date: '2026-06-26T19:00Z', group: 'Grupo I' }, // 1:00 PM CDT
+  { home: 'Francia',  hf: '🇫🇷', away: 'Senegal', af: '🇸🇳', date: '2026-06-16T18:00Z', group: 'Grupo I' }, // 1:00 PM CDT
+  { home: 'Irak',     hf: '🇮🇶', away: 'Noruega', af: '🇳🇴', date: '2026-06-16T21:00Z', group: 'Grupo I' }, // 4:00 PM CDT
+  { home: 'Francia',  hf: '🇫🇷', away: 'Irak',    af: '🇮🇶', date: '2026-06-22T20:00Z', group: 'Grupo I' }, // 3:00 PM CDT
+  { home: 'Noruega',  hf: '🇳🇴', away: 'Senegal', af: '🇸🇳', date: '2026-06-22T23:00Z', group: 'Grupo I' }, // 6:00 PM CDT
+  { home: 'Noruega',  hf: '🇳🇴', away: 'Francia', af: '🇫🇷', date: '2026-06-26T18:00Z', group: 'Grupo I' }, // 1:00 PM CDT
+  { home: 'Senegal',  hf: '🇸🇳', away: 'Irak',    af: '🇮🇶', date: '2026-06-26T18:00Z', group: 'Grupo I' }, // 1:00 PM CDT
 
   // ── Grupo J ──────────────────────────────────────────────────────────────
-  { home: 'Argentina', hf: '🇦🇷', away: 'Argelia',  af: '🇩🇿', date: '2026-06-17T01:00Z', group: 'Grupo J' }, // 7:00 PM CDT jun 16
-  { home: 'Austria',   hf: '🇦🇹', away: 'Jordania', af: '🇯🇴', date: '2026-06-17T04:00Z', group: 'Grupo J' }, // 10:00 PM CDT jun 16
-  { home: 'Argentina', hf: '🇦🇷', away: 'Austria',  af: '🇦🇹', date: '2026-06-22T17:00Z', group: 'Grupo J' }, // 11:00 AM CDT
-  { home: 'Jordania',  hf: '🇯🇴', away: 'Argelia',  af: '🇩🇿', date: '2026-06-23T03:00Z', group: 'Grupo J' }, // 9:00 PM CDT
-  { home: 'Argelia',   hf: '🇩🇿', away: 'Austria',  af: '🇦🇹', date: '2026-06-28T02:00Z', group: 'Grupo J' }, // 8:00 PM CDT jun 27
-  { home: 'Jordania',  hf: '🇯🇴', away: 'Argentina',af: '🇦🇷', date: '2026-06-28T02:00Z', group: 'Grupo J' }, // 8:00 PM CDT jun 27
+  { home: 'Argentina', hf: '🇦🇷', away: 'Argelia',  af: '🇩🇿', date: '2026-06-17T00:00Z', group: 'Grupo J' }, // 7:00 PM CDT jun 16
+  { home: 'Austria',   hf: '🇦🇹', away: 'Jordania', af: '🇯🇴', date: '2026-06-17T03:00Z', group: 'Grupo J' }, // 10:00 PM CDT jun 16
+  { home: 'Argentina', hf: '🇦🇷', away: 'Austria',  af: '🇦🇹', date: '2026-06-22T16:00Z', group: 'Grupo J' }, // 11:00 AM CDT
+  { home: 'Jordania',  hf: '🇯🇴', away: 'Argelia',  af: '🇩🇿', date: '2026-06-23T02:00Z', group: 'Grupo J' }, // 9:00 PM CDT
+  { home: 'Argelia',   hf: '🇩🇿', away: 'Austria',  af: '🇦🇹', date: '2026-06-28T01:00Z', group: 'Grupo J' }, // 8:00 PM CDT jun 27
+  { home: 'Jordania',  hf: '🇯🇴', away: 'Argentina',af: '🇦🇷', date: '2026-06-28T01:00Z', group: 'Grupo J' }, // 8:00 PM CDT jun 27
 
   // ── Grupo K ──────────────────────────────────────────────────────────────
-  { home: 'Portugal',   hf: '🇵🇹', away: 'RD Congo',   af: '🇨🇩', date: '2026-06-17T17:00Z', group: 'Grupo K' }, // 11:00 AM CDT
-  { home: 'Uzbekistán', hf: '🇺🇿', away: 'Colombia',   af: '🇨🇴', date: '2026-06-18T02:00Z', group: 'Grupo K' }, // 8:00 PM CDT
-  { home: 'Portugal',   hf: '🇵🇹', away: 'Uzbekistán', af: '🇺🇿', date: '2026-06-23T17:00Z', group: 'Grupo K' }, // 11:00 AM CDT
-  { home: 'Colombia',   hf: '🇨🇴', away: 'RD Congo',   af: '🇨🇩', date: '2026-06-24T02:00Z', group: 'Grupo K' }, // 8:00 PM CDT
-  { home: 'Colombia',   hf: '🇨🇴', away: 'Portugal',   af: '🇵🇹', date: '2026-06-27T23:30Z', group: 'Grupo K' }, // 5:30 PM CDT
-  { home: 'RD Congo',   hf: '🇨🇩', away: 'Uzbekistán', af: '🇺🇿', date: '2026-06-27T23:30Z', group: 'Grupo K' }, // 5:30 PM CDT
+  { home: 'Portugal',   hf: '🇵🇹', away: 'RD Congo',   af: '🇨🇩', date: '2026-06-17T16:00Z', group: 'Grupo K' }, // 11:00 AM CDT
+  { home: 'Uzbekistán', hf: '🇺🇿', away: 'Colombia',   af: '🇨🇴', date: '2026-06-18T01:00Z', group: 'Grupo K' }, // 8:00 PM CDT
+  { home: 'Portugal',   hf: '🇵🇹', away: 'Uzbekistán', af: '🇺🇿', date: '2026-06-23T16:00Z', group: 'Grupo K' }, // 11:00 AM CDT
+  { home: 'Colombia',   hf: '🇨🇴', away: 'RD Congo',   af: '🇨🇩', date: '2026-06-24T01:00Z', group: 'Grupo K' }, // 8:00 PM CDT
+  { home: 'Colombia',   hf: '🇨🇴', away: 'Portugal',   af: '🇵🇹', date: '2026-06-27T22:30Z', group: 'Grupo K' }, // 5:30 PM CDT
+  { home: 'RD Congo',   hf: '🇨🇩', away: 'Uzbekistán', af: '🇺🇿', date: '2026-06-27T22:30Z', group: 'Grupo K' }, // 5:30 PM CDT
 
   // ── Grupo L ──────────────────────────────────────────────────────────────
-  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Croacia',    af: '🇭🇷', date: '2026-06-17T20:00Z', group: 'Grupo L' }, // 2:00 PM CDT
-  { home: 'Ghana',      hf: '🇬🇭', away: 'Panamá',    af: '🇵🇦', date: '2026-06-17T23:00Z', group: 'Grupo L' }, // 5:00 PM CDT
-  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Ghana',     af: '🇬🇭', date: '2026-06-23T20:00Z', group: 'Grupo L' }, // 2:00 PM CDT
-  { home: 'Panamá',     hf: '🇵🇦', away: 'Croacia',   af: '🇭🇷', date: '2026-06-23T23:00Z', group: 'Grupo L' }, // 5:00 PM CDT
-  { home: 'Panamá',     hf: '🇵🇦', away: 'Inglaterra', af: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', date: '2026-06-27T21:00Z', group: 'Grupo L' }, // 3:00 PM CDT
-  { home: 'Croacia',    hf: '🇭🇷', away: 'Ghana',     af: '🇬🇭', date: '2026-06-27T21:00Z', group: 'Grupo L' }, // 3:00 PM CDT
+  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Croacia',    af: '🇭🇷', date: '2026-06-17T19:00Z', group: 'Grupo L' }, // 2:00 PM CDT
+  { home: 'Ghana',      hf: '🇬🇭', away: 'Panamá',    af: '🇵🇦', date: '2026-06-17T22:00Z', group: 'Grupo L' }, // 5:00 PM CDT
+  { home: 'Inglaterra', hf: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', away: 'Ghana',     af: '🇬🇭', date: '2026-06-23T19:00Z', group: 'Grupo L' }, // 2:00 PM CDT
+  { home: 'Panamá',     hf: '🇵🇦', away: 'Croacia',   af: '🇭🇷', date: '2026-06-23T22:00Z', group: 'Grupo L' }, // 5:00 PM CDT
+  { home: 'Panamá',     hf: '🇵🇦', away: 'Inglaterra', af: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', date: '2026-06-27T20:00Z', group: 'Grupo L' }, // 3:00 PM CDT
+  { home: 'Croacia',    hf: '🇭🇷', away: 'Ghana',     af: '🇬🇭', date: '2026-06-27T20:00Z', group: 'Grupo L' }, // 3:00 PM CDT
 ];
 
 function insertMatches() {
