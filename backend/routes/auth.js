@@ -11,8 +11,14 @@ router.post('/register', async (req, res) => {
   if (!username || !email || !password) {
     return res.status(400).json({ error: 'Todos los campos son requeridos' });
   }
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+  if (username.trim().length > 30) {
+    return res.status(400).json({ error: 'El nombre de usuario no puede superar 30 caracteres' });
+  }
+  if (email.length > 100) {
+    return res.status(400).json({ error: 'Email demasiado largo' });
+  }
+  if (password.length < 6 || password.length > 72) {
+    return res.status(400).json({ error: 'La contraseña debe tener entre 6 y 72 caracteres' });
   }
 
   try {

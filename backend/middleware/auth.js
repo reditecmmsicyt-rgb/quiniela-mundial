@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'mundial2026_secret_key_change_in_production';
+if (!process.env.JWT_SECRET) {
+  console.warn('⚠️  JWT_SECRET no está configurado. Establécelo como variable de entorno en producción.');
+}
 
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
