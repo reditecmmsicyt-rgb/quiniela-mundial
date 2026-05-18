@@ -41,7 +41,9 @@ db.exec(`
     ('pago_monto',        ''),
     ('pago_fecha_limite', ''),
     ('pago_metodos',      ''),
-    ('pago_notas',        '');
+    ('pago_notas',        ''),
+    ('invite_enabled',    '1'),
+    ('invite_code',       'mundial2026');
 
   CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

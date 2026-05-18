@@ -283,7 +283,7 @@ function AddMatchForm({ onAdded }) {
 }
 
 export default function Admin() {
-  const [tab, setTab]           = useState('matches'); // matches | users
+  const [tab, setTab]           = useState('matches'); // matches | users | invite
   const [matches, setMatches]   = useState([]);
   const [users, setUsers]       = useState([]);
   const [loadingM, setLoadingM] = useState(true);
@@ -294,6 +294,9 @@ export default function Admin() {
   const [deleting, setDeleting]       = useState(null);
   const [seeding, setSeeding]         = useState(null);
   const [seedMsg, setSeedMsg]         = useState('');
+  const [invite, setInvite]           = useState({ invite_enabled: '1', invite_code: '' });
+  const [inviteMsg, setInviteMsg]     = useState('');
+  const [inviteSaving, setInviteSaving] = useState(false);
 
   const loadMatches = useCallback(async () => {
     setLoadingM(true);
@@ -311,6 +314,26 @@ export default function Admin() {
 
   useEffect(() => { loadMatches(); }, [loadMatches]);
   useEffect(() => { if (tab === 'users') loadUsers(); }, [tab, loadUsers]);
+  useEffect(() => {
+    if (tab === 'invite') {
+      api.get('/settings/invite').then(d => setInvite(d)).catch(console.error);
+    }
+  }, [tab]);
+
+  async function handleInviteSave() {
+    setInviteSaving(true);
+    setInviteMsg('');
+    try {
+      const updated = await api.put('/settings/invite', invite);
+      setInvite(updated);
+      setInviteMsg('✅ Guardado');
+    } catch (e) {
+      setInviteMsg('❌ ' + e.message);
+    } finally {
+      setInviteSaving(false);
+      setTimeout(() => setInviteMsg(''), 3000);
+    }
+  }
 
   async function handleSeed(id) {
     setSeeding(id);
@@ -349,6 +372,9 @@ export default function Admin() {
         </button>
         <button onClick={() => setTab('users')} className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${tab === 'users' ? 'bg-green-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
           👥 Usuarios
+        </button>
+        <button onClick={() => setTab('invite')} className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${tab === 'invite' ? 'bg-green-700 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+          🔑 Invitación
         </button>
       </div>
 
@@ -464,6 +490,48 @@ export default function Admin() {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {tab === 'invite' && (
+        <div className="card max-w-md">
+          <h3 className="font-bold text-lg mb-1">🔑 Código de invitación</h3>
+          <p className="text-sm text-gray-400 mb-5">
+            Solo quienes tengan este código podrán registrarse en la quiniela.
+          </p>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-300">Requerir código para registrarse</span>
+              <button
+                onClick={() => setInvite(i => ({ ...i, invite_enabled: i.invite_enabled === '1' ? '0' : '1' }))}
+                className={`relative w-12 h-6 rounded-full transition-colors ${invite.invite_enabled === '1' ? 'bg-emerald-600' : 'bg-gray-600'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${invite.invite_enabled === '1' ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Código actual</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="input flex-1 font-mono"
+                  value={invite.invite_code}
+                  onChange={e => setInvite(i => ({ ...i, invite_code: e.target.value }))}
+                  placeholder="Escribe el código"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Comparte este código con tus amigos para que puedan registrarse.</p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <button onClick={handleInviteSave} className="btn-primary" disabled={inviteSaving}>
+                {inviteSaving ? 'Guardando...' : 'Guardar'}
+              </button>
+              {inviteMsg && <span className="text-sm">{inviteMsg}</span>}
+            </div>
+          </div>
         </div>
       )}
 

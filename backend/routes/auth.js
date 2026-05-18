@@ -21,6 +21,16 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'La contraseña debe tener entre 6 y 72 caracteres' });
   }
 
+  // Validar código de invitación si está activo
+  const inviteEnabled = db.prepare("SELECT value FROM settings WHERE key = 'invite_enabled'").get();
+  if (inviteEnabled?.value === '1') {
+    const { invite_code } = req.body;
+    const stored = db.prepare("SELECT value FROM settings WHERE key = 'invite_code'").get();
+    if (!invite_code || invite_code.trim() !== stored?.value) {
+      return res.status(403).json({ error: 'Código de invitación incorrecto' });
+    }
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = db.prepare(

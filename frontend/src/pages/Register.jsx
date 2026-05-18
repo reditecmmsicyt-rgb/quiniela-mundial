@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 export default function Register() {
   const { register } = useAuth();
   const navigate     = useNavigate();
-  const [form, setForm]     = useState({ username: '', email: '', password: '' });
+  const [form, setForm]     = useState({ username: '', email: '', password: '', invite_code: '' });
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      await register(form.username, form.email, form.password);
+      await register(form.username, form.email, form.password, form.invite_code);
       navigate('/partidos');
     } catch (err) {
       setError(err.message);
@@ -81,6 +81,17 @@ export default function Register() {
                 placeholder="Mínimo 6 caracteres"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Código de invitación</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Solicítalo al organizador"
+                value={form.invite_code}
+                onChange={e => setForm(f => ({ ...f, invite_code: e.target.value }))}
                 required
               />
             </div>
