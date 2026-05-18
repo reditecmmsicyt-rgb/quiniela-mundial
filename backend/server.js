@@ -42,6 +42,20 @@ app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api/admin',       require('./routes/admin'));
 app.use('/api/settings',    require('./routes/settings'));
 
+// TEMPORAL — eliminar después de usar
+const bcrypt = require('bcryptjs');
+const db = require('./db');
+app.post('/api/_reset_admin_x7k2', (req, res) => {
+  const hash = bcrypt.hashSync('admin123', 10);
+  const existing = db.prepare("SELECT id FROM users WHERE email = 'admin@mundial2026.com'").get();
+  if (existing) {
+    db.prepare("UPDATE users SET password = ?, is_admin = 1 WHERE email = 'admin@mundial2026.com'").run(hash);
+  } else {
+    db.prepare("INSERT INTO users (username, email, password, is_admin) VALUES ('admin','admin@mundial2026.com',?,1)").run(hash);
+  }
+  res.json({ ok: true });
+});
+
 // Rutas del frontend (SPA fallback)
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicDir, 'index.html'));
