@@ -184,4 +184,25 @@ router.get('/users/:id/predictions', (req, res) => {
   res.json({ user, predictions });
 });
 
+// Migración única: convierte fechas CDT→UTC (+6h) en partidos sin sufijo Z
+router.post('/migrate-dates', (req, res) => {
+  const matches = db.prepare('SELECT id, match_date FROM matches').all();
+  let updated = 0;
+  const stmt = db.prepare('UPDATE matches SET match_date = ? WHERE id = ?');
+
+  db.transaction(() => {
+    matches.forEach(m => {
+      if (m.match_date.endsWith('Z')) return; // ya en UTC
+      const d = new Date(m.match_date + '+00:00'); // parsear como UTC para luego sumar
+      // La fecha se guardó como CDT local: sumar 6h para convertir a UTC real
+      d.setHours(d.getHours() + 6);
+      const utc = d.toISOString().slice(0, 16) + 'Z';
+      stmt.run(utc, m.id);
+      updated++;
+    });
+  })();
+
+  res.json({ migrated: updated, total: matches.length });
+});
+
 module.exports = router;
