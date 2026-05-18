@@ -49,6 +49,18 @@
     @apply bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent;
   }
 
+  /* Animaciones */
+  .animate-float {
+    animation: float 3.5s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+  .glow-gold {
+    text-shadow: 0 0 30px rgba(251,191,36,0.4), 0 0 60px rgba(251,191,36,0.2);
+  }
+
   /* Borde festivo para tarjetas destacadas */
   .card-festive {
     @apply bg-gray-900/80 backdrop-blur-sm rounded-xl p-4 shadow-xl shadow-black/30;
@@ -69,4 +81,14 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }

@@ -28,19 +28,42 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-[88vh] flex items-center justify-center">
-      <div className="w-full max-w-md">
+    <div className="min-h-[92vh] flex flex-col items-center justify-center px-4 py-8">
 
-        <div className="text-center mb-8">
-          <div className="text-7xl mb-3 drop-shadow-lg">⚽</div>
-          <h1 className="text-4xl font-black bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-400 bg-clip-text text-transparent tracking-tight">
-            Quiniela Mundialista
-          </h1>
-          <p className="text-emerald-400 font-semibold mt-1 tracking-widest text-sm uppercase">
-            FIFA World Cup 2026
-          </p>
+      {/* Pelota flotante */}
+      <div className="animate-float mb-2 select-none">
+        <div className="text-8xl drop-shadow-2xl">⚽</div>
+      </div>
+
+      {/* Título */}
+      <div className="text-center mb-8">
+        <h1
+          className="text-5xl sm:text-6xl font-black tracking-tight glow-gold animate-shimmer"
+          style={{
+            background: 'linear-gradient(90deg, #fde68a, #f59e0b, #fbbf24, #f97316, #fbbf24, #f59e0b, #fde68a)',
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Quiniela Mundialista
+        </h1>
+        <p className="text-emerald-400 font-bold mt-2 tracking-[0.2em] text-sm uppercase">
+          FIFA World Cup 2026
+        </p>
+        <div className="flex items-center justify-center gap-3 mt-4">
+          {[['🇲🇽','México'],['🇺🇸','USA'],['🇨🇦','Canadá']].map(([flag, name]) => (
+            <div key={name} className="flex items-center gap-1.5 bg-gray-800/60 border border-gray-700/50 rounded-full px-3 py-1">
+              <span className="text-lg">{flag}</span>
+              <span className="text-xs font-semibold text-gray-300">{name}</span>
+            </div>
+          ))}
         </div>
+      </div>
 
+      {/* Card de registro */}
+      <div className="w-full max-w-sm">
         <div className="card-festive">
           <h2 className="text-xl font-bold mb-6 text-center text-gray-100">Crear Cuenta</h2>
 
@@ -85,7 +108,9 @@ export default function Register() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Código de invitación</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Código de invitación
+              </label>
               <input
                 type="text"
                 className="input"
@@ -100,17 +125,13 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-400 mt-5">
+          <div className="mt-5 pt-4 border-t border-gray-700/50 text-center text-sm text-gray-400">
             ¿Ya tienes cuenta?{' '}
             <Link to="/login" className="text-amber-400 hover:text-amber-300 font-semibold">
               Inicia sesión
             </Link>
-          </p>
+          </div>
         </div>
-
-        <p className="text-center text-xs text-gray-600 mt-6">
-          🇲🇽 México · 🇺🇸 USA · 🇨🇦 Canadá — Junio/Julio 2026
-        </p>
       </div>
     </div>
   );
