@@ -60,4 +60,18 @@ router.get('/me', authenticate, (req, res) => {
   res.json(user);
 });
 
+// TEMPORAL: resetear admin — se elimina después del primer uso
+router.post('/emergency-reset', async (req, res) => {
+  const { secret, new_password } = req.body;
+  if (secret !== process.env.RESET_SECRET) {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+  if (!new_password || new_password.length < 6) {
+    return res.status(400).json({ error: 'Contraseña muy corta' });
+  }
+  const hash = await bcrypt.hash(new_password, 10);
+  db.prepare("UPDATE users SET password = ? WHERE email = 'admin@mundial2026.com'").run(hash);
+  res.json({ message: 'Contraseña de admin actualizada' });
+});
+
 module.exports = router;
