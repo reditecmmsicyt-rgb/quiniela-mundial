@@ -115,7 +115,7 @@ export default function Login() {
 
         {/* Estadísticas decorativas */}
         <div className="grid grid-cols-3 gap-2 mt-4">
-          {[['48','Grupos'],['104','Partidos'],['32','Países']].map(([num, label]) => (
+          {[['48','Países'],['104','Partidos'],['12','Grupos']].map(([num, label]) => (
             <div key={label} className="bg-gray-900/50 border border-gray-700/40 rounded-lg py-2 text-center">
               <div className="text-lg font-black text-emerald-400">{num}</div>
               <div className="text-xs text-gray-500">{label}</div>
