@@ -35,7 +35,11 @@ function MatchCard({ match, onPredictionSaved }) {
   }
 
   function formatTime(d) {
-    return new Date(d).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    return new Date(d).toLocaleTimeString('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Mexico_City',
+    });
   }
 
   function pointsBadge(pts) {
@@ -159,17 +163,22 @@ export default function Matches() {
     return true;
   });
 
-  // Agrupar por día (YYYY-MM-DD) en orden cronológico
+  // Agrupar por día en zona horaria México (UTC-6) — "sv-SE" produce YYYY-MM-DD
+  function getMXDateKey(dateStr) {
+    return new Date(dateStr).toLocaleDateString('sv-SE', { timeZone: 'America/Mexico_City' });
+  }
+
   const days = {};
   filtered.forEach(m => {
-    const day = m.match_date.slice(0, 10);
+    const day = getMXDateKey(m.match_date);
     if (!days[day]) days[day] = [];
     days[day].push(m);
   });
 
-  function formatDayHeader(dateStr) {
-    const d = new Date(dateStr + 'T12:00:00');
-    return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+  function formatDayHeader(mxDateKey) {
+    // Noon UTC del día ya convertido a México — evita desfases de zona horaria del browser
+    const d = new Date(mxDateKey + 'T12:00:00Z');
+    return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
   }
 
   const totalPts = matches
@@ -272,10 +281,10 @@ export default function Matches() {
             <div className="flex items-center gap-3 mb-3">
               <div className="flex-shrink-0 bg-gradient-to-br from-emerald-700 to-green-600 rounded-lg px-3 py-1.5 text-center shadow-lg shadow-green-900/30">
                 <div className="text-xs text-emerald-200 uppercase tracking-wider font-semibold">
-                  {new Date(day + 'T12:00:00').toLocaleDateString('es-MX', { month: 'short' })}
+                  {new Date(day + 'T12:00:00Z').toLocaleDateString('es-MX', { month: 'short', timeZone: 'UTC' })}
                 </div>
                 <div className="text-2xl font-black text-white leading-none">
-                  {new Date(day + 'T12:00:00').getDate()}
+                  {new Date(day + 'T12:00:00Z').getUTCDate()}
                 </div>
               </div>
               <div>

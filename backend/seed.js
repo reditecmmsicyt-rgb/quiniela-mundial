@@ -45,7 +45,7 @@ const matches = [
   { home: 'Ecuador',         hf: '🇪🇨', away: 'Alemania',        af: '🇩🇪', date: '2026-06-25T20:00Z', group: 'Grupo E' }, // 2:00 PM CST
 
   // ── Grupo F ──────────────────────────────────────────────────────────────
-  { home: 'Países Bajos', hf: '🇳🇱', away: 'Japón',        af: '🇯🇵', date: '2026-06-14T20:00Z', group: 'Grupo F' }, // 2:00 PM CST
+  { home: 'Países Bajos', hf: '🇳🇱', away: 'Japón',        af: '🇯🇵', date: '2026-06-14T14:00Z', group: 'Grupo F' }, // 2:00 PM
   { home: 'Suecia',       hf: '🇸🇪', away: 'Túnez',        af: '🇹🇳', date: '2026-06-15T02:00Z', group: 'Grupo F' }, // 8:00 PM CST
   { home: 'Países Bajos', hf: '🇳🇱', away: 'Suecia',       af: '🇸🇪', date: '2026-06-20T17:00Z', group: 'Grupo F' }, // 11:00 AM CST
   { home: 'Túnez',        hf: '🇹🇳', away: 'Japón',        af: '🇯🇵', date: '2026-06-21T04:00Z', group: 'Grupo F' }, // 10:00 PM CST
